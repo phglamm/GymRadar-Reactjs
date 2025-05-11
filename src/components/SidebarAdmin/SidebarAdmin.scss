@@ -1,0 +1,23 @@
+.sidebar {
+  .ant-menu-item-selected {
+    background: #1d1d1d !important;
+    color: white !important;
+    .button-selected {
+      color: white !important;
+    }
+  }
+  // .ant-menu-submenu-title {
+  //   background: #d4dbf0 !important;
+  //   color: black !important;
+  // }
+
+  // .ant-menu {
+  //   background: #ffffff !important;
+  //   color: black !important;
+  // }
+
+  .ant-layout-sider-trigger {
+    background: #1d1111 !important;
+    color: #ed2a46 !important;
+  }
+}

@@ -3,7 +3,12 @@ import LogoColor from "../../assets/LogoColor.png";
 import { Button, Form, Input } from "antd";
 import authService from "../../services/authServices";
 import toast from "react-hot-toast";
-import { EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
+import {
+  EyeInvisibleOutlined,
+  EyeTwoTone,
+  LockOutlined,
+  PhoneOutlined,
+} from "@ant-design/icons";
 import { useState } from "react";
 import { FaFacebook, FaGoogle, FaApple } from "react-icons/fa";
 
@@ -45,7 +50,7 @@ export default function HomeLoginPage() {
   return (
     <div className="min-h-screen bg-[#242424] flex items-center justify-center">
       <motion.div
-        className="w-full max-w-lg"
+        className="w-full max-w-xl"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -70,7 +75,7 @@ export default function HomeLoginPage() {
           </div>
 
           {/* Middle gradient section with form */}
-          <div className="!bg-gradient-to-br !from-[#FF3A50] !to-[#FF914D] !p-6">
+          <div className="!bg-gradient-to-br !from-[#FF914D] !to-[#FF3A50] !py-10 !px-20">
             <Form
               form={form}
               layout="vertical"
@@ -102,6 +107,11 @@ export default function HomeLoginPage() {
                 ]}
               >
                 <Input
+                  prefix={
+                    <>
+                      <PhoneOutlined className="text-gray-400" />
+                    </>
+                  }
                   placeholder="09XXXXXXXX"
                   type="tel"
                   className="!rounded-lg !py-3 !px-3 !border-0"
@@ -130,6 +140,11 @@ export default function HomeLoginPage() {
                 className="mb-0"
               >
                 <Input.Password
+                  prefix={
+                    <>
+                      <LockOutlined className="text-gray-400" />
+                    </>
+                  }
                   placeholder="••••••"
                   className="!rounded-lg !py-3 !px-3 !border-0"
                   iconRender={(visible) =>
@@ -143,10 +158,11 @@ export default function HomeLoginPage() {
           {/* Bottom white section with buttons */}
           <div className="px-6 py-6 bg-white text-center">
             <Button
-              type="primary"
               onClick={() => form.submit()}
               loading={loading}
-              className="!w-[60%] !rounded-full !h-10 !font-medium !bg-[#FF914D] !border-0"
+              color="orange"
+              variant="solid"
+              className="!w-[35%] !rounded-full !h-10 !font-medium !border-0"
             >
               Đăng nhập
             </Button>

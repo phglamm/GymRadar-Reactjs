@@ -1,5 +1,28 @@
 import React from "react";
+import { Breadcrumb, Layout } from "antd";
+import { motion } from "framer-motion";
+import { Link, Outlet, useLocation } from "react-router-dom";
+import SidebarAdmin from "../../components/SidebarAdmin/SidebarAdmin";
+import HeaderAdmin from "../../components/HeaderAdmin/HeaderAdmin";
+const { Sider, Content } = Layout;
 
 export default function AdminLayout() {
-  return <div>AdminLayout</div>;
+  return (
+    <>
+      <Layout className="!min-h-screen">
+        <SidebarAdmin />
+        <Layout className="!bg-[#ffffff]">
+          <HeaderAdmin />
+
+          {/* <Outlet /> */}
+
+          <Content className="!p-4 flex flex-col">
+            <div className="!p-8 !bg-[#ffffff] flex-1">
+              <Outlet />
+            </div>
+          </Content>
+        </Layout>
+      </Layout>
+    </>
+  );
 }
