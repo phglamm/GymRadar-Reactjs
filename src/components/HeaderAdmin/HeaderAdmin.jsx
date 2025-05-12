@@ -1,10 +1,23 @@
 import { useSelector } from "react-redux";
-import { selectUser } from "../../../redux/features/userSlice";
 import { Badge, Layout } from "antd";
 import { LogoutOutlined, NotificationFilled } from "@ant-design/icons";
+import { selectUser } from "../../redux/features/userSlice";
 const { Header } = Layout;
+import { useDispatch } from "react-redux";
+import { logout } from "../../redux/features/userSlice";
+import { useNavigate } from "react-router-dom";
+import { route } from "../../routes";
+import Cookies from "js-cookie";
 export default function HeaderAdmin() {
   const user = useSelector(selectUser);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    Cookies.remove("token");
+    Cookies.remove("user");
+    dispatch(logout());
+    navigate(route.welcomeLogin);
+  };
   return (
     <Header className="!bg-gradient-to-br !from-[#FF914D] !to-[#FF3A50] !text-white flex items-center justify-end shadow-md gap-15">
       <Badge count={5} size="small" color="#FF914D">
@@ -24,7 +37,10 @@ export default function HeaderAdmin() {
           <p className="text-sm">{user?.role || "Admin"}</p>
         </div>
       </div>
-      <LogoutOutlined style={{ fontSize: "25px", cursor: "pointer" }} />
+      <LogoutOutlined
+        style={{ fontSize: "25px", cursor: "pointer" }}
+        onClick={handleLogout}
+      />
     </Header>
   );
 }

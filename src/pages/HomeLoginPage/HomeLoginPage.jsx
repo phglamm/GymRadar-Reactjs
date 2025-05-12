@@ -11,11 +11,16 @@ import {
 } from "@ant-design/icons";
 import { useState } from "react";
 import { FaFacebook, FaGoogle, FaApple } from "react-icons/fa";
-
+import { useDispatch } from "react-redux";
+import { login } from "../../redux/features/userSlice";
+import { useNavigate } from "react-router-dom";
+import { route } from "./../../routes/index";
+import Cookies from "js-cookie";
 export default function HomeLoginPage() {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const handleLogin = async (values) => {
     setLoading(true);
     console.log("Login values:", values);
@@ -27,6 +32,25 @@ export default function HomeLoginPage() {
     try {
       const response = await authService.login(requestData);
       console.log("Login response:", response);
+      if (response.data.role === "ADMIN") {
+        navigate(`${route.admin}/${route.dashboard}`);
+      }
+      if (response.data.role === "GYM") {
+        navigate(`${route.admin}/${route.dashboard}`);
+      } else {
+        toast.error("Tài khoản không có quyền truy cập");
+        return;
+      }
+      const user = {
+        id: response.data.id,
+        phone: response.data.phone,
+        role: response.data.role,
+      };
+      Cookies.set("token", response.data.accessToken);
+
+      Cookies.set("user", JSON.stringify(user));
+      dispatch(login(user));
+
       toast.success("Đăng nhập thành công");
     } catch (error) {
       console.log("Login error:", error);
