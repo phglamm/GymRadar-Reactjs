@@ -7,6 +7,8 @@ import HeaderAdmin from "../../components/HeaderAdmin/HeaderAdmin";
 const { Sider, Content } = Layout;
 
 export default function AdminLayout() {
+  const location = useLocation(); // To get the current URL path
+
   return (
     <>
       <Layout className="!min-h-screen">
