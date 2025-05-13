@@ -43,6 +43,7 @@ export default function HomeLoginPage() {
       }
       const user = {
         id: response.data.id,
+        fullName: response.data.fullName,
         phone: response.data.phone,
         role: response.data.role,
       };

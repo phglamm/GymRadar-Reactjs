@@ -12,6 +12,8 @@ import { Link, useLocation } from "react-router-dom";
 import { route } from "../../routes";
 import logo from "../../assets/LogoColor.png";
 import "./SidebarAdmin.scss";
+import { useSelector } from "react-redux";
+import { selectUser } from "../../redux/features/userSlice";
 
 export default function SidebarAdmin() {
   function getItem(label, key, icon, children) {
@@ -28,40 +30,76 @@ export default function SidebarAdmin() {
   const dataOpen = JSON.parse(localStorage.getItem("keys")) ?? [];
   const [openKeys, setOpenKeys] = useState(dataOpen);
   const [collapsed, setCollapsed] = useState(false);
+  const user = useSelector(selectUser);
 
   useEffect(() => {
-    setItems([
-      getItem(
-        "Thống Kê",
-        `${route.admin}/${route.dashboard}`,
-        <BarChartOutlined />
-      ),
-      getItem(
-        "Quản Lý User",
-        `${route.admin}/${route.manageUser}`,
-        <UserOutlined />
-      ),
-      getItem(
-        "Quản Lý Phòng Tập",
-        `${route.admin}/${route.manageGym}`,
-        <UserOutlined />
-      ),
-      getItem(
-        "Quản Lý PT",
-        `${route.admin}/${route.managePT}`,
-        <UserOutlined />
-      ),
-      getItem(
-        "Quản Lý Gói Tập",
-        `${route.admin}/${route.managePackages}`,
-        <DropboxOutlined />
-      ),
-      getItem(
-        "Thông Báo",
-        `${route.admin}/${route.manageNotification}`,
-        <NotificationOutlined />
-      ),
-    ]);
+    if (user?.role === "ADMIN") {
+      setItems([
+        getItem(
+          "Thống Kê",
+          `${route.admin}/${route.dashboard}`,
+          <BarChartOutlined />
+        ),
+        getItem(
+          "Quản Lý User",
+          `${route.admin}/${route.manageUser}`,
+          <UserOutlined />
+        ),
+        getItem(
+          "Quản Lý Các Phòng Tập",
+          `${route.admin}/${route.manageGym}`,
+          <UserOutlined />
+        ),
+        getItem(
+          "Quản Lý PT",
+          `${route.admin}/${route.managePT}`,
+          <UserOutlined />
+        ),
+        getItem(
+          "Quản Lý Gói Tập",
+          `${route.admin}/${route.managePackages}`,
+          <DropboxOutlined />
+        ),
+        getItem(
+          "Thông Báo",
+          `${route.admin}/${route.manageNotification}`,
+          <NotificationOutlined />
+        ),
+      ]);
+    } else if (user?.role === "GYM") {
+      setItems([
+        getItem(
+          "Số Liệu",
+          `${route.gym}/${route.dashboardGym}`,
+          <BarChartOutlined />
+        ),
+        getItem(
+          "Quản Lý Phòng Tập",
+          `${route.gym}/${route.manageinformationGym}`,
+          <DropboxOutlined />
+        ),
+        getItem(
+          "Quản Lý PT",
+          `${route.gym}/${route.managePTGym}`,
+          <UserOutlined />
+        ),
+        getItem(
+          "Quản Lý Gói Tập",
+          `${route.gym}/${route.managePackagesGym}`,
+          <DropboxOutlined />
+        ),
+        getItem(
+          "Lịch sử giao dịch",
+          `${route.gym}/${route.manageTransactionGym}`,
+          <DropboxOutlined />
+        ),
+        getItem(
+          "Hợp đồng & hóa đơn",
+          `${route.gym}/${route.billandcontract}`,
+          <DropboxOutlined />
+        ),
+      ]);
+    }
   }, []);
 
   const handleSubMenuOpen = (keyMenuItem) => {

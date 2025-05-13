@@ -2,31 +2,35 @@ import {
   Button,
   Card,
   ConfigProvider,
+  DatePicker,
   Form,
   Input,
+  InputNumber,
   Modal,
+  Select,
   Space,
   Spin,
   Switch,
   Table,
 } from "antd";
 import React, { useEffect, useState } from "react";
-import adminService from "../../../services/adminServices";
 import toast from "react-hot-toast";
 import { LoadingOutlined, SearchOutlined } from "@ant-design/icons";
 import { FaPlus } from "react-icons/fa";
+import gymService from "../../../services/gymServices";
+import dayjs from "dayjs";
 
-export default function ManageGymPage() {
+export default function ManagePTGym() {
   const [gym, setGym] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [isModalAddGymOpen, setIsModalAddGymOpen] = useState(false);
   const [formAdd] = Form.useForm();
   const [loadingAdd, setLoadingAdd] = useState(false);
-  const fetchGym = async () => {
+  const fetchPTGym = async () => {
     setLoading(true);
     try {
-      const response = await adminService.getAllGym();
+      const response = await gymService.getAllGym();
       console.log(response);
       setGym(response);
     } catch (error) {
@@ -36,7 +40,7 @@ export default function ManageGymPage() {
     }
   };
   useEffect(() => {
-    fetchGym();
+    fetchPTGym();
   }, []);
 
   if (loading) {
@@ -57,8 +61,8 @@ export default function ManageGymPage() {
       title: "Are you sure you want to delete this gym?",
       onOk: async () => {
         try {
-          await adminService.deleteGym(id);
-          fetchGym();
+          await gymService.deleteGym(id);
+          fetchPTGym();
           toast.success("Gym deleted successfully");
         } catch (error) {
           console.error("Error deleting gym:", error);
@@ -76,7 +80,7 @@ export default function ManageGymPage() {
       align: "center",
     },
     {
-      title: "Gym Name",
+      title: "Full Name",
       dataIndex: "name",
       key: "name",
       align: "center",
@@ -102,40 +106,38 @@ export default function ManageGymPage() {
 
   const filteredData = searchText
     ? gym.filter((item) =>
-        (item.name?.toLowerCase() || "").includes(searchText.toLowerCase())
+        (item.fullName?.toLowerCase() || "").includes(searchText.toLowerCase())
       )
     : gym;
 
-  const handleAddGym = async (values) => {
+  const handleAddPTGym = async (values) => {
     setLoadingAdd(true);
     console.log(values);
     const requestData = {
       phone: values.phone,
       email: values.email,
       password: values.password,
-      createNewGym: {
-        gymName: values.gymName,
-        since: values.since,
-        address: values.address,
-        representName: values.representName,
-        taxCode: values.taxCode,
-        longitude: values.longitude,
-        latitude: values.latitude,
-        qrcode: values.qrcode,
-        hotResearch: values.hotResearch,
+      createNewPT: {
+        fullName: values.fullName,
+        dob: dayjs(values.dob).format("YYYY-MM-DD"),
+        weight: values.weight,
+        height: values.height,
+        goalTraining: values.goalTraining,
+        experience: values.experience,
+        gender: values.gender,
       },
     };
-    console.log("Request Add Gym", requestData);
+    console.log("Request Add PT Gym", requestData);
     try {
-      const response = await adminService.addGym(requestData);
-      toast.success("Gym added successfully");
-      fetchGym();
+      const response = await gymService.addPT(requestData);
+      toast.success("PT added successfully");
+      fetchPTGym();
       setIsModalAddGymOpen(false);
       formAdd.resetFields();
       console.log(response);
     } catch (error) {
       console.log(error);
-      toast.error(error.response?.data?.message || "Failed to add gym");
+      toast.error(error.response?.data?.message || "Failed to add PT to Gym");
     } finally {
       setLoadingAdd(false);
     }
@@ -148,7 +150,7 @@ export default function ManageGymPage() {
       >
         <div className="flex justify-end items-center mb-6">
           <Input
-            placeholder="Tìm kiếm theo tên phòng gym"
+            placeholder="Tìm kiếm theo tên PT"
             prefix={<SearchOutlined />}
             onChange={(e) => setSearchText(e.target.value)}
             style={{ width: 250 }}
@@ -161,7 +163,7 @@ export default function ManageGymPage() {
             variant="solid"
             onClick={() => setIsModalAddGymOpen(true)}
           >
-            Thêm Phòng Gym
+            Thêm PT
           </Button>
         </div>
         <Table
@@ -179,9 +181,7 @@ export default function ManageGymPage() {
       <Modal
         open={isModalAddGymOpen}
         onCancel={() => setIsModalAddGymOpen(false)}
-        title={
-          <p className="text-2xl font-bold text-[#ED2A46]">Thêm Phòng Gym</p>
-        }
+        title={<p className="text-2xl font-bold text-[#ED2A46]">Thêm PT</p>}
         footer={null}
         width={700}
       >
@@ -189,7 +189,7 @@ export default function ManageGymPage() {
           form={formAdd}
           layout="vertical"
           requiredMark={false}
-          onFinish={handleAddGym}
+          onFinish={handleAddPTGym}
           className="max-h-[65vh] overflow-y-auto !py-5 !px-15"
         >
           <Form.Item
@@ -231,14 +231,14 @@ export default function ManageGymPage() {
           <Form.Item
             label={
               <p className="text-xl font-bold text-[#ED2A46]">
-                Mật Khẩu Phòng Gym
+                Mật Khẩu cho PT
               </p>
             }
             name="password"
             rules={[
               {
                 required: true,
-                message: "Vui lòng nhập mật khẩu cho phòng Gym!",
+                message: "Vui lòng nhập mật khẩu cho PT!",
               },
             ]}
           >
@@ -247,95 +247,83 @@ export default function ManageGymPage() {
 
           <Form.Item
             label={
-              <p className="text-xl font-bold text-[#ED2A46]">Tên Phòng Gym</p>
+              <p className="text-xl font-bold text-[#ED2A46]">Họ và tên</p>
             }
-            name="gymName"
-            rules={[
-              { required: true, message: "Vui lòng nhập tên phòng gym!" },
-            ]}
-          >
-            <Input placeholder="Phòng Gym" />
-          </Form.Item>
-
-          <Form.Item
-            label={
-              <p className="text-xl font-bold text-[#ED2A46]">Hoạt động từ</p>
-            }
-            name="since"
-            rules={[{ required: true, message: "Bắt buộc nhập hoạt động từ" }]}
-          >
-            <Input placeholder="2025" type="number" />
-          </Form.Item>
-
-          <Form.Item
-            label={<p className="text-xl font-bold text-[#ED2A46]">Địa chỉ</p>}
-            name="address"
-            rules={[{ required: true, message: "Bắt buộc nhập địa chỉ" }]}
-          >
-            <Input placeholder="123 Nguyễn Văn Linh, Hanoi" />
-          </Form.Item>
-
-          <Form.Item
-            label={
-              <p className="text-xl font-bold text-[#ED2A46]">
-                Tên Người Đại Diện
-              </p>
-            }
-            name="representName"
-            rules={[
-              { required: true, message: "Bắt buộc nhập tên người đại diện" },
-            ]}
+            name="fullName"
+            rules={[{ required: true, message: "Vui lòng nhập họ và tên" }]}
           >
             <Input placeholder="Nguyễn Văn A" />
           </Form.Item>
 
           <Form.Item
             label={
-              <p className="text-xl font-bold text-[#ED2A46]">Mã Số Thuế</p>
+              <p className="text-xl font-bold text-[#ED2A46]">Ngày sinh</p>
             }
-            name="taxCode"
-            rules={[{ required: true, message: "Bắt buộc nhập mã số thuế" }]}
+            name="dob"
+            rules={[{ required: true, message: "Vui lòng chọn ngày sinh" }]}
           >
-            <Input placeholder="ABC1234" />
-          </Form.Item>
-
-          <Form.Item
-            label={<p className="text-xl font-bold text-[#ED2A46]">Kinh Độ</p>}
-            name="longitude"
-            rules={[{ required: true, message: "Bắt buộc nhập kinh độ" }]}
-          >
-            <Input placeholder="25.80.234" type="number" />
-          </Form.Item>
-
-          <Form.Item
-            label={<p className="text-xl font-bold text-[#ED2A46]">Vĩ Độ</p>}
-            name="latitude"
-            rules={[{ required: true, message: "Bắt buộc nhập vĩ độ" }]}
-          >
-            <Input placeholder="25.80.234" type="number" />
-          </Form.Item>
-
-          <Form.Item
-            label={<p className="text-xl font-bold text-[#ED2A46]">QR Code</p>}
-            name="qrcode"
-            rules={[{ required: true, message: "Bắt buộc QR code" }]}
-          >
-            <Input placeholder="QR123456" />
+            <DatePicker
+              format="DD-MM-YYYY"
+              className="w-full"
+              placeholder="Chọn ngày sinh"
+            />
           </Form.Item>
 
           <Form.Item
             label={
-              <p className="text-xl font-bold text-[#ED2A46]">Hot Research</p>
+              <p className="text-xl font-bold text-[#ED2A46]">Cân nặng (kg)</p>
             }
-            name="hotResearch"
-            valuePropName="checked"
-            defaultValue={false}
+            name="weight"
+            rules={[{ required: true, message: "Vui lòng nhập cân nặng" }]}
           >
-            <Switch
-              checkedChildren="Bật"
-              unCheckedChildren="Tắt"
-              size="large"
-            />
+            <InputNumber min={0} placeholder="e.g. 70" className="!w-full" />
+          </Form.Item>
+
+          <Form.Item
+            label={
+              <p className="text-xl font-bold text-[#ED2A46]">Chiều cao (cm)</p>
+            }
+            name="height"
+            rules={[{ required: true, message: "Vui lòng nhập chiều cao" }]}
+          >
+            <InputNumber min={0} placeholder="e.g. 170" className="!w-full" />
+          </Form.Item>
+
+          <Form.Item
+            label={
+              <p className="text-xl font-bold text-[#ED2A46]">
+                Mục tiêu tập luyện
+              </p>
+            }
+            name="goalTraining"
+            rules={[{ required: true, message: "Vui lòng nhập mục tiêu" }]}
+          >
+            <Input placeholder="Tăng cơ, giảm mỡ, ..." />
+          </Form.Item>
+
+          <Form.Item
+            label={
+              <p className="text-xl font-bold text-[#ED2A46]">
+                Kinh nghiệm (năm)
+              </p>
+            }
+            name="experience"
+            rules={[{ required: true, message: "Vui lòng nhập kinh nghiệm" }]}
+          >
+            <InputNumber min={0} placeholder="e.g. 2" className="!w-full" />
+          </Form.Item>
+
+          <Form.Item
+            label={
+              <p className="text-xl font-bold text-[#ED2A46]">Giới tính</p>
+            }
+            name="gender"
+            rules={[{ required: true, message: "Vui lòng chọn giới tính" }]}
+          >
+            <Select placeholder="Chọn giới tính">
+              <Select.Option value="Male">Nam</Select.Option>
+              <Select.Option value="Female">Nữ</Select.Option>
+            </Select>
           </Form.Item>
 
           <div className="text-center">

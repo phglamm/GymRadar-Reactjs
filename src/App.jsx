@@ -16,7 +16,12 @@ import ManagePTPage from "./pages/AdminPages/ManagePTPage/ManagePTPage";
 import ManageNotificationPage from "./pages/AdminPages/ManageNotificationPage/ManageNotificationPage";
 import ManagePackagesPage from "./pages/AdminPages/ManagePackagesPage/ManagePackagesPage";
 import ManageUserPage from "./pages/AdminPages/ManageUserPage/ManageUserPage";
-
+import ManagePTGym from "./pages/GymPages/ManagePTGym/ManagePTGym";
+import GymBillandContract from "./pages/GymPages/GymBillandContract/GymBillandContract";
+import ManageGymTransaction from "./pages/GymPages/ManageGymTransaction/ManageGymTransaction";
+import ManageGymInformation from "./pages/GymPages/ManageGymInformation/ManageGymInformation";
+import DashboardGym from "./pages/GymPages/DashboardGym/DashboardGym";
+import ManageGymPackages from "./pages/GymPages/ManageGymPackages/ManageGymPackages";
 function App() {
   const router = createBrowserRouter([
     {
@@ -52,6 +57,37 @@ function App() {
         {
           path: route.manageUser,
           element: <ManageUserPage />,
+        },
+      ],
+    },
+    {
+      path: route.gym,
+      element: <AdminLayout />,
+      children: [
+        {
+          index: true,
+          path: route.dashboardGym,
+          element: <DashboardGym />,
+        },
+        {
+          path: route.manageinformationGym,
+          element: <ManageGymInformation />,
+        },
+        {
+          path: route.managePTGym,
+          element: <ManagePTGym />,
+        },
+        {
+          path: route.managePackagesGym,
+          element: <ManageGymPackages />,
+        },
+        {
+          path: route.manageTransactionGym,
+          element: <ManageGymTransaction />,
+        },
+        {
+          path: route.billandcontract,
+          element: <GymBillandContract />,
         },
       ],
     },
