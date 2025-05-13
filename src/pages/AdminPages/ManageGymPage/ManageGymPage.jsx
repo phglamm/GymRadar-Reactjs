@@ -15,6 +15,8 @@ import adminService from "../../../services/adminServices";
 import toast from "react-hot-toast";
 import { LoadingOutlined, SearchOutlined } from "@ant-design/icons";
 import { FaPlus } from "react-icons/fa";
+import { ImBin } from "react-icons/im";
+import { MdEdit } from "react-icons/md";
 
 export default function ManageGymPage() {
   const [gym, setGym] = useState([]);
@@ -23,18 +25,33 @@ export default function ManageGymPage() {
   const [isModalAddGymOpen, setIsModalAddGymOpen] = useState(false);
   const [formAdd] = Form.useForm();
   const [loadingAdd, setLoadingAdd] = useState(false);
-  const fetchGym = async () => {
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: 0,
+  });
+
+  const fetchGym = async (page = 1, pageSize = 10) => {
     setLoading(true);
     try {
-      const response = await adminService.getAllGym();
-      console.log(response);
-      setGym(response);
+      const response = await adminService.getAllGym({ page, size: pageSize });
+      const { items, total, page: currentPage } = response.data;
+
+      setGym(items);
+      console.log(items);
+      setPagination({
+        current: currentPage,
+        pageSize,
+        total,
+      });
     } catch (error) {
       console.error("Error fetching gyms:", error);
+      toast.error("Lỗi khi lấy danh sách phòng gym");
     } finally {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     fetchGym();
   }, []);
@@ -55,6 +72,11 @@ export default function ManageGymPage() {
   const handleDelete = async (id) => {
     Modal.confirm({
       title: "Are you sure you want to delete this gym?",
+      type: "warning",
+      content: "This action cannot be undone.",
+      okText: "Delete",
+      cancelText: "Cancel",
+      okType: "danger",
       onOk: async () => {
         try {
           await adminService.deleteGym(id);
@@ -70,35 +92,66 @@ export default function ManageGymPage() {
 
   const columns = [
     {
-      title: "ID",
-      dataIndex: "id",
-      key: "id",
+      title: "Tên Phòng Gym",
+      dataIndex: "gymName",
+      key: "gymName",
       align: "center",
     },
     {
-      title: "Gym Name",
-      dataIndex: "name",
-      key: "name",
+      title: "Số Điện Thoại",
+      dataIndex: "address",
+      key: "address",
       align: "center",
     },
     {
-      title: "Location",
-      dataIndex: "location",
-      key: "location",
+      title: "Địa Chỉ",
+      dataIndex: "address",
+      key: "address",
       align: "center",
     },
     {
-      title: "Action",
+      title: "Tên Người Đại Diện",
+      dataIndex: "representName",
+      key: "representName",
+      align: "center",
+    },
+    {
+      title: "Hot Research",
+      dataIndex: "hotResearch",
+      key: "hotResearch",
+      align: "center",
+      render: (text, record) => (
+        <Switch
+          checked={record.hotResearch}
+          disabled
+          checkedChildren="Có"
+          unCheckedChildren="Không"
+        />
+      ),
+    },
+
+    {
+      title: "Hành Động",
       key: "action",
       align: "center",
 
       render: (text, record) => (
-        <Button color="danger" onClick={() => handleDelete(record.id)}>
-          <a>Delete</a>
-        </Button>
+        <div className="flex justify-center items-center gap-2">
+          <ImBin
+            onClick={() => handleDelete(record.id)}
+            color="#ED2A46"
+            size={25}
+            className="cursor-pointer"
+          />
+          <MdEdit className="cursor-pointer" size={25} color="#FF914D" />
+        </div>
       ),
     },
   ];
+
+  const handleTableChange = (pagination) => {
+    fetchGym(pagination.current, pagination.pageSize);
+  };
 
   const filteredData = searchText
     ? gym.filter((item) =>
@@ -165,14 +218,17 @@ export default function ManageGymPage() {
           </Button>
         </div>
         <Table
+          rowKey="id"
           dataSource={filteredData}
           columns={columns}
           pagination={{
-            pageSize: 10,
+            current: pagination.current,
+            pageSize: pagination.pageSize,
+            total: pagination.total,
             showSizeChanger: false,
-            hideOnSinglePage: true,
             position: ["bottomCenter"],
           }}
+          onChange={handleTableChange}
         />
       </ConfigProvider>
 

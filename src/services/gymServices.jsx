@@ -33,6 +33,8 @@ const request = async (method, url, data = null, headers = {}, params = {}) => {
 const gymService = {
   getAllGym: () => request("GET", "category"),
   addPT: (data) => request("POST", "v1/pt", data),
+
+  getPTofGym: (params) => request("GET", "v1/pt", null, {}, params),
 };
 
 export default gymService;

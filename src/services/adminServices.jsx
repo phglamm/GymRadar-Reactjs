@@ -31,12 +31,9 @@ const request = async (method, url, data = null, headers = {}, params = {}) => {
 };
 
 const adminService = {
-  getAllGym: () => request("GET", "category"),
+  getAllGym: (params) => request("GET", "v1/gym", null, {}, params),
   addGym: (data) => request("POST", "v1/gym", data),
-
-  getAllUser: () => request("GET", "user/get-all"),
-  getAllPT: () => request("GET", "pt/get-all"),
-  getAllPackages: () => request("GET", "packages/get-all"),
+  getAllPT: (params) => request("GET", "v1/admin/get-pt", null, {}, params),
 };
 
 export default adminService;

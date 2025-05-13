@@ -19,29 +19,47 @@ import { LoadingOutlined, SearchOutlined } from "@ant-design/icons";
 import { FaPlus } from "react-icons/fa";
 import gymService from "../../../services/gymServices";
 import dayjs from "dayjs";
+import { ImBin } from "react-icons/im";
+import { MdEdit } from "react-icons/md";
 
 export default function ManagePTGym() {
-  const [gym, setGym] = useState([]);
+  const [pts, setPts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [isModalAddGymOpen, setIsModalAddGymOpen] = useState(false);
   const [formAdd] = Form.useForm();
   const [loadingAdd, setLoadingAdd] = useState(false);
-  const fetchPTGym = async () => {
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: 0,
+  });
+  const fetchPTGym = async (page = 1, pageSize = 10) => {
     setLoading(true);
     try {
-      const response = await gymService.getAllGym();
-      console.log(response);
-      setGym(response);
+      const response = await gymService.getPTofGym({ page, size: pageSize });
+      const { items, total, page: currentPage } = response.data;
+      setPts(items);
+      console.log(items);
+      setPagination({
+        current: currentPage,
+        pageSize,
+        total,
+      });
     } catch (error) {
-      console.error("Error fetching gyms:", error);
+      console.error("Error fetching Pts:", error);
     } finally {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     fetchPTGym();
   }, []);
+
+  const handleTableChange = (pagination) => {
+    fetchPTGym(pagination.current, pagination.pageSize);
+  };
 
   if (loading) {
     return (
@@ -74,41 +92,59 @@ export default function ManagePTGym() {
 
   const columns = [
     {
-      title: "ID",
-      dataIndex: "id",
-      key: "id",
+      title: "Tên PT",
+      dataIndex: "fullName",
+      key: "fullName",
       align: "center",
     },
     {
-      title: "Full Name",
-      dataIndex: "name",
-      key: "name",
-      align: "center",
-    },
-    {
-      title: "Location",
+      title: "Phòng gym liên kết",
       dataIndex: "location",
       key: "location",
       align: "center",
     },
     {
-      title: "Action",
+      title: "Khách hàng liên kết",
+      dataIndex: "location",
+      key: "location",
+      align: "center",
+    },
+    {
+      title: "Gói tập liên kết",
+      dataIndex: "location",
+      key: "location",
+      align: "center",
+    },
+    {
+      title: "Trạng Thái",
+      dataIndex: "location",
+      key: "location",
+      align: "center",
+    },
+    {
+      title: "Hành động",
       key: "action",
       align: "center",
 
       render: (text, record) => (
-        <Button color="danger" onClick={() => handleDelete(record.id)}>
-          <a>Delete</a>
-        </Button>
+        <div className="flex justify-center items-center gap-2">
+          <ImBin
+            onClick={() => handleDelete(record.id)}
+            color="#ED2A46"
+            size={25}
+            className="cursor-pointer"
+          />
+          <MdEdit className="cursor-pointer" size={25} color="#FF914D" />
+        </div>
       ),
     },
   ];
 
   const filteredData = searchText
-    ? gym.filter((item) =>
+    ? pts.filter((item) =>
         (item.fullName?.toLowerCase() || "").includes(searchText.toLowerCase())
       )
-    : gym;
+    : pts;
 
   const handleAddPTGym = async (values) => {
     setLoadingAdd(true);
@@ -170,11 +206,13 @@ export default function ManagePTGym() {
           dataSource={filteredData}
           columns={columns}
           pagination={{
-            pageSize: 10,
+            current: pagination.current,
+            pageSize: pagination.pageSize,
+            total: pagination.total,
             showSizeChanger: false,
-            hideOnSinglePage: true,
             position: ["bottomCenter"],
           }}
+          onChange={handleTableChange}
         />
       </ConfigProvider>
 

@@ -32,10 +32,10 @@ export default function HomeLoginPage() {
     try {
       const response = await authService.login(requestData);
       console.log("Login response:", response);
+      console.log(response.data.role);
       if (response.data.role === "ADMIN") {
         navigate(`${route.admin}/${route.dashboard}`);
-      }
-      if (response.data.role === "GYM") {
+      } else if (response.data.role === "GYM") {
         navigate(`${route.admin}/${route.dashboard}`);
       } else {
         toast.error("Tài khoản không có quyền truy cập");
