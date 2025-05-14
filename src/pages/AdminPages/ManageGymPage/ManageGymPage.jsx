@@ -17,6 +17,7 @@ import { LoadingOutlined, SearchOutlined } from "@ant-design/icons";
 import { FaPlus } from "react-icons/fa";
 import { ImBin } from "react-icons/im";
 import { MdEdit } from "react-icons/md";
+import { IoBarbell } from "react-icons/io5";
 
 export default function ManageGymPage() {
   const [gym, setGym] = useState([]);
@@ -236,7 +237,10 @@ export default function ManageGymPage() {
         open={isModalAddGymOpen}
         onCancel={() => setIsModalAddGymOpen(false)}
         title={
-          <p className="text-2xl font-bold text-[#ED2A46]">Thêm Phòng Gym</p>
+          <p className="text-2xl font-bold text-[#ED2A46] flex items-center gap-2">
+            <IoBarbell />
+            Thêm Phòng Gym
+          </p>
         }
         footer={null}
         width={700}

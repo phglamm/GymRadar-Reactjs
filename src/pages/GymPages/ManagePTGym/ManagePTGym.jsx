@@ -21,6 +21,7 @@ import gymService from "../../../services/gymServices";
 import dayjs from "dayjs";
 import { ImBin } from "react-icons/im";
 import { MdEdit } from "react-icons/md";
+import { IoBarbell } from "react-icons/io5";
 
 export default function ManagePTGym() {
   const [pts, setPts] = useState([]);
@@ -76,15 +77,15 @@ export default function ManagePTGym() {
   }
   const handleDelete = async (id) => {
     Modal.confirm({
-      title: "Are you sure you want to delete this gym?",
+      title: "Bạn có chắc chắn muốn xóa PT này không?",
       onOk: async () => {
         try {
           await gymService.deleteGym(id);
           fetchPTGym();
-          toast.success("Gym deleted successfully");
+          toast.success("Bạn đã xoá PT thành công");
         } catch (error) {
           console.error("Error deleting gym:", error);
-          toast.error(error.response?.data?.message || "Failed to delete gym");
+          toast.error(error.response?.data?.message || "Lỗi khi xoá PT");
         }
       },
     });
@@ -166,14 +167,14 @@ export default function ManagePTGym() {
     console.log("Request Add PT Gym", requestData);
     try {
       const response = await gymService.addPT(requestData);
-      toast.success("PT added successfully");
+      toast.success("Thêm PT thành công");
       fetchPTGym();
       setIsModalAddGymOpen(false);
       formAdd.resetFields();
       console.log(response);
     } catch (error) {
       console.log(error);
-      toast.error(error.response?.data?.message || "Failed to add PT to Gym");
+      toast.error(error.response?.data?.message || "Lỗi thêm PT thất bại");
     } finally {
       setLoadingAdd(false);
     }
@@ -219,7 +220,12 @@ export default function ManagePTGym() {
       <Modal
         open={isModalAddGymOpen}
         onCancel={() => setIsModalAddGymOpen(false)}
-        title={<p className="text-2xl font-bold text-[#ED2A46]">Thêm PT</p>}
+        title={
+          <p className="text-2xl font-bold text-[#ED2A46] flex items-center gap-2">
+            <IoBarbell />
+            Thêm PT
+          </p>
+        }
         footer={null}
         width={700}
       >
