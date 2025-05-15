@@ -36,6 +36,10 @@ const gymService = {
 
   getCourseOfGym: (params) => request("GET", "v1/course", null, {}, params),
   addCourse: (data) => request("POST", "v1/course", data),
+
+  getSlotOfGym: (params) => request("GET", "v1/slot", null, {}, params),
+  addSlot: (data) => request("POST", "v1/slot", data),
+  deleteSlot: (id) => request("DELETE", `v1/slot/${id}`),
 };
 
 export default gymService;

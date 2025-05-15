@@ -22,6 +22,7 @@ import ManageGymTransaction from "./pages/GymPages/ManageGymTransaction/ManageGy
 import ManageGymInformation from "./pages/GymPages/ManageGymInformation/ManageGymInformation";
 import DashboardGym from "./pages/GymPages/DashboardGym/DashboardGym";
 import ManageGymPackages from "./pages/GymPages/ManageGymPackages/ManageGymPackages";
+import ManageSlotGym from "./pages/GymPages/ManageSlotGym/ManageSlotGym";
 function App() {
   const router = createBrowserRouter([
     {
@@ -84,6 +85,10 @@ function App() {
         {
           path: route.manageTransactionGym,
           element: <ManageGymTransaction />,
+        },
+        {
+          path: route.manageSlotGym,
+          element: <ManageSlotGym />,
         },
         {
           path: route.billandcontract,

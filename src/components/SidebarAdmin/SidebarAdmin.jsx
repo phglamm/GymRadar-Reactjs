@@ -83,9 +83,15 @@ export default function SidebarAdmin() {
           `${route.gym}/${route.managePTGym}`,
           <UserOutlined />
         ),
+
         getItem(
           "Quản Lý Gói Tập",
           `${route.gym}/${route.managePackagesGym}`,
+          <DropboxOutlined />
+        ),
+        getItem(
+          "Quản Lý Slot Đặt Lịch",
+          `${route.gym}/${route.manageSlotGym}`,
           <DropboxOutlined />
         ),
         getItem(
