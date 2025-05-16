@@ -80,7 +80,8 @@ export default function ManagePTGym() {
       title: "Bạn có chắc chắn muốn xóa PT này không?",
       onOk: async () => {
         try {
-          await gymService.deleteGym(id);
+          const response = await gymService.deletePT(id);
+          console.log("Delete PT response:", response);
           fetchPTGym();
           toast.success("Bạn đã xoá PT thành công");
         } catch (error) {
