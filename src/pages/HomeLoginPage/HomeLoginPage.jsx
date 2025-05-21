@@ -191,31 +191,6 @@ export default function HomeLoginPage() {
             >
               Đăng nhập
             </Button>
-
-            <p className="text-gray-600 mt-4 mb-3">hoặc đăng nhập bằng</p>
-
-            <div className="flex justify-center space-x-6">
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <FaGoogle size={24} className="text-red-500" />
-              </motion.button>
-
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <FaFacebook size={24} className="text-blue-600" />
-              </motion.button>
-
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <FaApple size={24} className="text-black" />
-              </motion.button>
-            </div>
           </div>
         </motion.div>
       </motion.div>
