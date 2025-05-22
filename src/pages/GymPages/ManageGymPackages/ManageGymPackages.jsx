@@ -16,7 +16,7 @@ import {
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { LoadingOutlined, SearchOutlined } from "@ant-design/icons";
-import { FaPlus } from "react-icons/fa";
+import { FaEye, FaPlus } from "react-icons/fa";
 import gymService from "../../../services/gymServices";
 import dayjs from "dayjs";
 import { ImBin } from "react-icons/im";
@@ -26,9 +26,20 @@ export default function ManageGymPackages() {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState("");
+  const [selectedCourse, setSelectedCourse] = useState(null);
   const [isModalAddCourseOpen, setIsModalAddCourseOpen] = useState(false);
+  const [isModalGymCouseDetailOpen, setIsModalGymCouseDetailOpen] =
+    useState(false);
+  const [pts, setPts] = useState([]);
+  const [isModalAddGymCoursePTOpen, setIsModalAddGymCoursePTOpen] =
+    useState(false);
+
   const [formAdd] = Form.useForm();
+  const [formAddGymCourse] = Form.useForm();
+
   const [loadingAdd, setLoadingAdd] = useState(false);
+  const [loadingAddGymCoursePT, setLoadingAddGymCoursePT] = useState(false);
+
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
@@ -56,8 +67,21 @@ export default function ManageGymPackages() {
     }
   };
 
+  const fetchPTGym = async (page = 1, pageSize = 10) => {
+    setLoading(true);
+    try {
+      const response = await gymService.getPTofGym({ page, size: pageSize });
+      const { items } = response.data;
+      setPts(items);
+      console.log(items);
+    } catch (error) {
+      console.error("Error fetching Pts:", error);
+    }
+  };
+
   useEffect(() => {
     fetchCoursesGym();
+    fetchPTGym();
   }, []);
 
   const handleTableChange = (pagination) => {
@@ -133,6 +157,24 @@ export default function ManageGymPackages() {
 
       render: (text, record) => (
         <div className="flex justify-center items-center gap-2">
+          <FaEye
+            onClick={() => {
+              setIsModalGymCouseDetailOpen(true);
+              setSelectedCourse(record);
+              fetchGymCourseDetail(record.id);
+            }}
+            size={25}
+            className="cursor-pointer"
+          />
+          <Button
+            type="primary"
+            onClick={() => {
+              setIsModalAddGymCoursePTOpen(true);
+              setSelectedCourse(record);
+            }}
+          >
+            Thêm PT vào gói Tập
+          </Button>
           <ImBin
             onClick={() => handleDelete(record.id)}
             color="#ED2A46"
@@ -145,6 +187,14 @@ export default function ManageGymPackages() {
     },
   ];
 
+  const fetchGymCourseDetail = async (id) => {
+    try {
+      const response = await gymService.getDetailGymCoursePT({ id });
+      console.log("GymCourseDetail", response.data);
+    } catch (error) {
+      console.error("Error fetching Gym Course Detail:", error);
+    }
+  };
   const filteredData = searchText
     ? courses.filter((item) =>
         (item.name?.toLowerCase() || "").includes(searchText.toLowerCase())
@@ -175,6 +225,31 @@ export default function ManageGymPackages() {
       toast.error(error.response?.data?.message || "Lỗi thêm gói tập thất bại");
     } finally {
       setLoadingAdd(false);
+    }
+  };
+
+  const handleAddGymCoursePT = async (values) => {
+    setLoadingAddGymCoursePT(true);
+    console.log(values);
+    const requestData = {
+      ptid: values.ptid,
+      gymCourseId: selectedCourse.id,
+      session: values.session,
+    };
+    console.log("Request Add PT to Course", requestData);
+    try {
+      const response = await gymService.addPTToCourse(requestData);
+      toast.success("Thêm PT vào gói tập thành công");
+      setIsModalAddGymCoursePTOpen(false);
+      formAddGymCourse.resetFields();
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+      toast.error(
+        error.response?.data?.message || "Lỗi thêm PT vào gói tập thất bại"
+      );
+    } finally {
+      setLoadingAddGymCoursePT(false);
     }
   };
 
@@ -307,6 +382,76 @@ export default function ManageGymPackages() {
           </div>
         </Form>
       </Modal>
+
+      <Modal
+        open={isModalAddGymCoursePTOpen}
+        onCancel={() => setIsModalAddGymCoursePTOpen(false)}
+        title={
+          <p className="text-2xl font-bold text-[#ED2A46] flex items-center gap-2">
+            <IoBarbell />
+            Thêm PT vào Gói Tập
+          </p>
+        }
+        footer={null}
+        width={700}
+      >
+        <Form
+          form={formAddGymCourse}
+          layout="vertical"
+          requiredMark={false}
+          onFinish={handleAddGymCoursePT}
+          className="max-h-[65vh] overflow-y-auto !py-5 !px-15"
+        >
+          <Form.Item
+            label={
+              <p className="text-xl font-bold text-[#ED2A46]">Số lượng buổi</p>
+            }
+            name="session"
+            rules={[{ required: true, message: "Vui lòng tên gói" }]}
+          >
+            <InputNumber min={1} className="!w-full" />
+          </Form.Item>
+
+          <Form.Item
+            label={<p className="text-xl font-bold text-[#ED2A46]">Chọn PT</p>}
+            name="ptid"
+            rules={[{ required: true, message: "Vui lòng chọn loại gói tập" }]}
+          >
+            <Select placeholder="Chọn PT">
+              {pts.map((pt) => (
+                <Select.Option key={pt.id} value={pt.id}>
+                  {pt.fullName}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          <div className="text-center">
+            <Button
+              onClick={() => formAddGymCourse.submit()}
+              loading={loadingAddGymCoursePT}
+              color="orange"
+              variant="solid"
+              className="!w-[50%] !rounded-full !h-10 !font-medium !border-0 shadow-2xl"
+            >
+              Gửi Thông Tin
+            </Button>
+          </div>
+        </Form>
+      </Modal>
+
+      <Modal
+        open={isModalGymCouseDetailOpen}
+        onCancel={() => setIsModalGymCouseDetailOpen(false)}
+        title={
+          <p className="text-2xl font-bold text-[#ED2A46] flex items-center gap-2">
+            <IoBarbell />
+            PT trong Gói Tập
+          </p>
+        }
+        footer={null}
+        width={700}
+      ></Modal>
     </div>
   );
 }
