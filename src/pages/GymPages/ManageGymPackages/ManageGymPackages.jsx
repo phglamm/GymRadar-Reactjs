@@ -16,9 +16,8 @@ import {
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { LoadingOutlined, SearchOutlined } from "@ant-design/icons";
-import { FaEye, FaPlus } from "react-icons/fa";
+import { FaEye, FaPlus, FaPlusCircle } from "react-icons/fa";
 import gymService from "../../../services/gymServices";
-import dayjs from "dayjs";
 import { ImBin } from "react-icons/im";
 import { MdEdit } from "react-icons/md";
 import { IoBarbell } from "react-icons/io5";
@@ -39,6 +38,7 @@ export default function ManageGymPackages() {
 
   const [loadingAdd, setLoadingAdd] = useState(false);
   const [loadingAddGymCoursePT, setLoadingAddGymCoursePT] = useState(false);
+  const [ptsInCourse, setPtsInCourse] = useState([]);
 
   const [pagination, setPagination] = useState({
     current: 1,
@@ -161,20 +161,22 @@ export default function ManageGymPackages() {
             onClick={() => {
               setIsModalGymCouseDetailOpen(true);
               setSelectedCourse(record);
-              fetchGymCourseDetail(record.id);
+              fetchPTInCourse(record.id);
             }}
             size={25}
             className="cursor-pointer"
           />
-          <Button
-            type="primary"
+
+          <FaPlusCircle
             onClick={() => {
               setIsModalAddGymCoursePTOpen(true);
               setSelectedCourse(record);
             }}
-          >
-            Thêm PT vào gói Tập
-          </Button>
+            color="#ED2A46"
+            size={25}
+            className="cursor-pointer"
+          />
+
           <ImBin
             onClick={() => handleDelete(record.id)}
             color="#ED2A46"
@@ -187,14 +189,16 @@ export default function ManageGymPackages() {
     },
   ];
 
-  const fetchGymCourseDetail = async (id) => {
+  const fetchPTInCourse = async (id) => {
     try {
-      const response = await gymService.getDetailGymCoursePT({ id });
-      console.log("GymCourseDetail", response.data);
+      const response = await gymService.getPTOfCourse(id);
+      console.log("PT in this Course: ", response.data);
+      setPtsInCourse(response.data.items);
     } catch (error) {
       console.error("Error fetching Gym Course Detail:", error);
     }
   };
+
   const filteredData = searchText
     ? courses.filter((item) =>
         (item.name?.toLowerCase() || "").includes(searchText.toLowerCase())
@@ -252,6 +256,52 @@ export default function ManageGymPackages() {
       setLoadingAddGymCoursePT(false);
     }
   };
+
+  const ptInCourseColumns = [
+    {
+      title: "Họ và tên",
+      dataIndex: "fullName",
+      key: "fullName",
+      align: "center",
+    },
+    {
+      title: "Ngày sinh",
+      dataIndex: "dob",
+      key: "dob",
+      align: "center",
+      render: (dob) => new Date(dob).toLocaleDateString("vi-VN"),
+    },
+    {
+      title: "Chiều cao (cm)",
+      dataIndex: "height",
+      key: "height",
+      align: "center",
+    },
+    {
+      title: "Cân nặng (kg)",
+      dataIndex: "weight",
+      key: "weight",
+      align: "center",
+    },
+    {
+      title: "Mục tiêu tập luyện",
+      dataIndex: "goalTraining",
+      key: "goalTraining",
+      align: "center",
+    },
+    {
+      title: "Kinh nghiệm (năm)",
+      dataIndex: "experience",
+      key: "experience",
+      align: "center",
+    },
+    {
+      title: "Giới tính",
+      dataIndex: "gender",
+      key: "gender",
+      align: "center",
+    },
+  ];
 
   return (
     <div className="">
@@ -389,7 +439,7 @@ export default function ManageGymPackages() {
         title={
           <p className="text-2xl font-bold text-[#ED2A46] flex items-center gap-2">
             <IoBarbell />
-            Thêm PT vào Gói Tập
+            Thêm PT vào Gói Tập {selectedCourse?.name}
           </p>
         }
         footer={null}
@@ -446,12 +496,20 @@ export default function ManageGymPackages() {
         title={
           <p className="text-2xl font-bold text-[#ED2A46] flex items-center gap-2">
             <IoBarbell />
-            PT trong Gói Tập
+            PT trong Gói Tập {selectedCourse?.name}
           </p>
         }
         footer={null}
-        width={700}
-      ></Modal>
+        width={900}
+      >
+        <Table
+          dataSource={ptsInCourse}
+          columns={ptInCourseColumns}
+          pagination={false}
+          bordered
+          size="middle"
+        />
+      </Modal>
     </div>
   );
 }
