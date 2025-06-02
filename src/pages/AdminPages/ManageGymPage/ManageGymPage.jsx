@@ -18,6 +18,7 @@ import { FaPlus } from "react-icons/fa";
 import { ImBin } from "react-icons/im";
 import { MdEdit } from "react-icons/md";
 import { IoBarbell } from "react-icons/io5";
+import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 
 export default function ManageGymPage() {
   const [gym, setGym] = useState([]);
@@ -31,6 +32,20 @@ export default function ManageGymPage() {
     pageSize: 10,
     total: 0,
   });
+  const [position, setPosition] = useState(null);
+
+  const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey: "AIzaSyBUQ7fgnOaws1lzGbOfN0L2zVwxRw-m1gU", // <-- Replace this
+  });
+  const containerStyle = {
+    width: "100%",
+    height: "400px",
+  };
+
+  const center = {
+    lat: 10.762622,
+    lng: 106.660172,
+  };
 
   const fetchGym = async (page = 1, pageSize = 10) => {
     setLoading(true);
@@ -194,6 +209,19 @@ export default function ManageGymPage() {
       setLoadingAdd(false);
     }
   };
+
+  const handleMapClick = (e) => {
+    const lat = e.latLng.lat();
+    const lng = e.latLng.lng();
+    setPosition({ lat, lng });
+
+    formAdd.setFieldsValue({
+      latitude: lat,
+      longitude: lng,
+    });
+  };
+
+  if (!isLoaded) return <div>Loading Map...</div>;
 
   return (
     <div className="">
@@ -374,6 +402,15 @@ export default function ManageGymPage() {
           >
             <Input placeholder="25.80.234" type="number" />
           </Form.Item>
+
+          <GoogleMap
+            mapContainerStyle={containerStyle}
+            center={center}
+            zoom={13}
+            onClick={handleMapClick}
+          >
+            {position && <Marker position={position} />}
+          </GoogleMap>
 
           <Form.Item
             label={<p className="text-xl font-bold text-[#ED2A46]">QR Code</p>}
