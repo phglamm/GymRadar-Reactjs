@@ -23,11 +23,16 @@ import ManageGymInformation from "./pages/GymPages/ManageGymInformation/ManageGy
 import DashboardGym from "./pages/GymPages/DashboardGym/DashboardGym";
 import ManageGymPackages from "./pages/GymPages/ManageGymPackages/ManageGymPackages";
 import ManageSlotGym from "./pages/GymPages/ManageSlotGym/ManageSlotGym";
+import OrderProcessPage from "./pages/OrderProcessPage/OrderProcessPage";
 function App() {
   const router = createBrowserRouter([
     {
       path: route.welcomeLogin,
       element: <HomeLoginPage />,
+    },
+    {
+      path: route.orderProcess,
+      element: <OrderProcessPage />,
     },
 
     {
@@ -96,6 +101,7 @@ function App() {
         },
       ],
     },
+
     {
       path: "*",
       element: <Navigate to={route.welcomeLogin} />,

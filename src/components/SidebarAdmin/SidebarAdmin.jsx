@@ -14,6 +14,13 @@ import logo from "../../assets/LogoColor.png";
 import "./SidebarAdmin.scss";
 import { useSelector } from "react-redux";
 import { selectUser } from "../../redux/features/userSlice";
+import { Dumbbell } from "lucide";
+import { FaDumbbell } from "react-icons/fa";
+import { GiTeacher } from "react-icons/gi";
+import { FaRegCalendarCheck } from "react-icons/fa";
+import { GrTransaction } from "react-icons/gr";
+import { LiaFileContractSolid } from "react-icons/lia";
+import { GiGymBag } from "react-icons/gi";
 
 export default function SidebarAdmin() {
   function getItem(label, key, icon, children) {
@@ -48,17 +55,17 @@ export default function SidebarAdmin() {
         getItem(
           "Quản Lý Các Phòng Tập",
           `${route.admin}/${route.manageGym}`,
-          <UserOutlined />
+          <FaDumbbell />
         ),
         getItem(
           "Quản Lý PT",
           `${route.admin}/${route.managePT}`,
-          <UserOutlined />
+          <GiTeacher />
         ),
         getItem(
           "Quản Lý Gói Tập",
           `${route.admin}/${route.managePackages}`,
-          <DropboxOutlined />
+          <GiGymBag />
         ),
         getItem(
           "Thông Báo",
@@ -76,33 +83,33 @@ export default function SidebarAdmin() {
         getItem(
           "Quản Lý Phòng Tập",
           `${route.gym}/${route.manageinformationGym}`,
-          <DropboxOutlined />
+          <FaDumbbell />
         ),
         getItem(
           "Quản Lý PT",
           `${route.gym}/${route.managePTGym}`,
-          <UserOutlined />
+          <GiTeacher />
         ),
 
         getItem(
           "Quản Lý Gói Tập",
           `${route.gym}/${route.managePackagesGym}`,
-          <DropboxOutlined />
+          <GiGymBag />
         ),
         getItem(
           "Quản Lý Slot Đặt Lịch",
           `${route.gym}/${route.manageSlotGym}`,
-          <DropboxOutlined />
+          <FaRegCalendarCheck />
         ),
         getItem(
           "Lịch sử giao dịch",
           `${route.gym}/${route.manageTransactionGym}`,
-          <DropboxOutlined />
+          <GrTransaction />
         ),
         getItem(
           "Hợp đồng & hóa đơn",
           `${route.gym}/${route.billandcontract}`,
-          <DropboxOutlined />
+          <LiaFileContractSolid />
         ),
       ]);
     }

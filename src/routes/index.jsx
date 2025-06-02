@@ -18,4 +18,6 @@ export const route = {
   manageTransactionGym: "manage-transaction-gym",
   billandcontract: "bill-and-contract",
   manageSlotGym: "manage-slot-gym",
+
+  orderProcess: "order-process",
 };
