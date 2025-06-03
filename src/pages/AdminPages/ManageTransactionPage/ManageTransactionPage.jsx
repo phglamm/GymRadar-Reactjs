@@ -59,17 +59,12 @@ export default function ManageTransactionPage() {
   });
 
   // Fetch all transactions for admin
-  const fetchTransactions = async (page = 1, pageSize = 10, filters = {}) => {
+  const fetchTransactions = async (page = 1, pageSize = 10) => {
     setLoading(true);
     try {
       const response = await transactionService.getAdminTransaction({
         page,
         size: pageSize,
-        status: filters.status !== "all" ? filters.status : undefined,
-        gymId: filters.gymId !== "all" ? filters.gymId : undefined,
-        startDate: filters.startDate,
-        endDate: filters.endDate,
-        search: filters.search,
       });
 
       const { items, total, page: currentPage, totalPages } = response.data;

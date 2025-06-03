@@ -9,16 +9,42 @@ import {
   Spin,
   Switch,
   Table,
+  Row,
+  Col,
+  Statistic,
+  Badge,
+  Tag,
+  Tooltip,
+  Avatar,
+  Typography,
+  Divider,
 } from "antd";
 import React, { useEffect, useState } from "react";
 import adminService from "../../../services/adminServices";
 import toast from "react-hot-toast";
-import { LoadingOutlined, SearchOutlined } from "@ant-design/icons";
-import { FaPlus } from "react-icons/fa";
+import {
+  LoadingOutlined,
+  SearchOutlined,
+  PlusOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  HomeOutlined,
+  PhoneOutlined,
+  EnvironmentOutlined,
+  UserOutlined,
+  FireOutlined,
+  CalendarOutlined,
+  QrcodeOutlined,
+  BankOutlined,
+  GlobalOutlined,
+} from "@ant-design/icons";
+import { FaPlus, FaDumbbell, FaMapMarkerAlt } from "react-icons/fa";
 import { ImBin } from "react-icons/im";
-import { MdEdit } from "react-icons/md";
-import { IoBarbell } from "react-icons/io5";
+import { MdEdit, MdLocationOn } from "react-icons/md";
+import { IoBarbell, IoLocationSharp } from "react-icons/io5";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
+
+const { Title, Text } = Typography;
 
 export default function ManageGymPage() {
   const [gym, setGym] = useState([]);
@@ -33,13 +59,21 @@ export default function ManageGymPage() {
     total: 0,
   });
   const [position, setPosition] = useState(null);
+  const [statistics, setStatistics] = useState({
+    totalGyms: 0,
+    hotResearchGyms: 0,
+    normalGyms: 0,
+    averageYear: 0,
+  });
 
   const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: "AIzaSyBUQ7fgnOaws1lzGbOfN0L2zVwxRw-m1gU", // <-- Replace this
+    googleMapsApiKey: "AIzaSyBUQ7fgnOaws1lzGbOfN0L2zVwxRw-m1gU",
   });
+
   const containerStyle = {
     width: "100%",
     height: "400px",
+    borderRadius: "12px",
   };
 
   const center = {
@@ -54,7 +88,24 @@ export default function ManageGymPage() {
       const { items, total, page: currentPage } = response.data;
 
       setGym(items);
-      console.log(items);
+
+      // Update statistics
+      const hotResearchCount = items.filter((gym) => gym.hotResearch).length;
+      const avgYear =
+        items.length > 0
+          ? Math.round(
+              items.reduce((sum, gym) => sum + (gym.since || 2020), 0) /
+                items.length
+            )
+          : 0;
+
+      setStatistics({
+        totalGyms: total,
+        hotResearchGyms: hotResearchCount,
+        normalGyms: total - hotResearchCount,
+        averageYear: avgYear,
+      });
+
       setPagination({
         current: currentPage,
         pageSize,
@@ -72,35 +123,26 @@ export default function ManageGymPage() {
     fetchGym();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <Spin
-          indicator={
-            <LoadingOutlined style={{ fontSize: 48, color: "#FF914D" }} spin />
-          }
-          tip="Loading"
-          size="large"
-        />
-      </div>
-    );
-  }
   const handleDelete = async (id) => {
     Modal.confirm({
-      title: "Are you sure you want to delete this gym?",
-      type: "warning",
-      content: "This action cannot be undone.",
-      okText: "Delete",
-      cancelText: "Cancel",
+      title: "Xác nhận xóa phòng gym",
+      content:
+        "Bạn có chắc chắn muốn xóa phòng gym này? Hành động này không thể hoàn tác.",
+      okText: "Xóa",
+      cancelText: "Hủy",
       okType: "danger",
+      centered: true,
+      icon: <DeleteOutlined style={{ color: "#ff4d4f" }} />,
       onOk: async () => {
         try {
           await adminService.deleteGym(id);
           fetchGym();
-          toast.success("Gym deleted successfully");
+          toast.success("Đã xóa phòng gym thành công");
         } catch (error) {
           console.error("Error deleting gym:", error);
-          toast.error(error.response?.data?.message || "Failed to delete gym");
+          toast.error(
+            error.response?.data?.message || "Không thể xóa phòng gym"
+          );
         }
       },
     });
@@ -108,59 +150,131 @@ export default function ManageGymPage() {
 
   const columns = [
     {
-      title: "Tên Phòng Gym",
+      title: "Thông Tin Phòng Gym",
       dataIndex: "gymName",
       key: "gymName",
-      align: "center",
-    },
-    {
-      title: "Số Điện Thoại",
-      dataIndex: "address",
-      key: "address",
-      align: "center",
-    },
-    {
-      title: "Địa Chỉ",
-      dataIndex: "address",
-      key: "address",
-      align: "center",
-    },
-    {
-      title: "Tên Người Đại Diện",
-      dataIndex: "representName",
-      key: "representName",
-      align: "center",
-    },
-    {
-      title: "Hot Research",
-      dataIndex: "hotResearch",
-      key: "hotResearch",
-      align: "center",
+      width: 300,
       render: (text, record) => (
-        <Switch
-          checked={record.hotResearch}
-          disabled
-          checkedChildren="Có"
-          unCheckedChildren="Không"
-        />
+        <div className="flex items-center gap-3">
+          <Avatar
+            size={50}
+            icon={<FaDumbbell />}
+            style={{
+              backgroundColor: record.hotResearch ? "#ff4d4f" : "#FF914D",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          />
+          <div>
+            <div className="font-semibold text-gray-900 text-base mb-1">
+              {text}
+              {record.hotResearch && (
+                <Tag color="red" className="ml-2" icon={<FireOutlined />}>
+                  HOT
+                </Tag>
+              )}
+            </div>
+            <div className="flex items-center text-sm text-gray-500 mb-1">
+              <EnvironmentOutlined className="mr-1" />
+              {record.address}
+            </div>
+            <div className="flex items-center text-sm text-gray-500">
+              <CalendarOutlined className="mr-1" />
+              Hoạt động từ {record.since || "N/A"}
+            </div>
+          </div>
+        </div>
       ),
     },
-
+    {
+      title: "Liên Hệ",
+      dataIndex: "phone",
+      key: "contact",
+      width: 200,
+      render: (phone, record) => (
+        <div className="space-y-2">
+          <div className="flex items-center text-gray-700">
+            <PhoneOutlined className="mr-2 text-blue-500" />
+            <span>{phone || record.address}</span>
+          </div>
+          <div className="flex items-center text-gray-700">
+            <UserOutlined className="mr-2 text-green-500" />
+            <span className="font-medium">{record.representName}</span>
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: "Vị Trí",
+      key: "location",
+      width: 150,
+      render: (_, record) => (
+        <div className="text-center">
+          <div className="flex items-center justify-center mb-2">
+            <IoLocationSharp className="text-red-500 text-lg mr-1" />
+            <span className="font-medium text-gray-700">Tọa độ</span>
+          </div>
+          {record.latitude && record.longitude ? (
+            <div className="text-xs text-gray-500 space-y-1">
+              <div>Lat: {record.latitude}</div>
+              <div>Lng: {record.longitude}</div>
+            </div>
+          ) : (
+            <span className="text-gray-400">Chưa có</span>
+          )}
+        </div>
+      ),
+    },
+    {
+      title: "Trạng Thái",
+      dataIndex: "hotResearch",
+      key: "hotResearch",
+      width: 120,
+      align: "center",
+      render: (hotResearch) => (
+        <div className="flex flex-col items-center space-y-2">
+          <Switch
+            checked={hotResearch}
+            disabled
+            size="small"
+            style={{
+              backgroundColor: hotResearch ? "#ff4d4f" : undefined,
+            }}
+          />
+          <Badge
+            status={hotResearch ? "success" : "default"}
+            text={hotResearch ? "Hot Research" : "Bình thường"}
+            className="text-xs"
+          />
+        </div>
+      ),
+    },
     {
       title: "Hành Động",
       key: "action",
+      width: 120,
       align: "center",
-
       render: (text, record) => (
-        <div className="flex justify-center items-center gap-2">
-          <ImBin
-            onClick={() => handleDelete(record.id)}
-            color="#ED2A46"
-            size={25}
-            className="cursor-pointer"
-          />
-          <MdEdit className="cursor-pointer" size={25} color="#FF914D" />
-        </div>
+        <Space>
+          <Tooltip title="Chỉnh sửa">
+            <Button
+              type="text"
+              icon={<EditOutlined />}
+              className="text-orange-500 hover:bg-orange-50"
+              onClick={() => console.log("Edit gym:", record)}
+            />
+          </Tooltip>
+          <Tooltip title="Xóa">
+            <Button
+              type="text"
+              icon={<DeleteOutlined />}
+              danger
+              className="hover:bg-red-50"
+              onClick={() => handleDelete(record.id)}
+            />
+          </Tooltip>
+        </Space>
       ),
     },
   ];
@@ -170,14 +284,22 @@ export default function ManageGymPage() {
   };
 
   const filteredData = searchText
-    ? gym.filter((item) =>
-        (item.name?.toLowerCase() || "").includes(searchText.toLowerCase())
+    ? gym.filter(
+        (item) =>
+          (item.gymName?.toLowerCase() || "").includes(
+            searchText.toLowerCase()
+          ) ||
+          (item.address?.toLowerCase() || "").includes(
+            searchText.toLowerCase()
+          ) ||
+          (item.representName?.toLowerCase() || "").includes(
+            searchText.toLowerCase()
+          )
       )
     : gym;
 
   const handleAddGym = async (values) => {
     setLoadingAdd(true);
-    console.log(values);
     const requestData = {
       phone: values.phone,
       email: values.email,
@@ -194,17 +316,16 @@ export default function ManageGymPage() {
         hotResearch: values.hotResearch,
       },
     };
-    console.log("Request Add Gym", requestData);
+
     try {
-      const response = await adminService.addGym(requestData);
-      toast.success("Gym added successfully");
+      await adminService.addGym(requestData);
+      toast.success("Thêm phòng gym thành công!");
       fetchGym();
       setIsModalAddGymOpen(false);
       formAdd.resetFields();
-      console.log(response);
+      setPosition(null);
     } catch (error) {
-      console.log(error);
-      toast.error(error.response?.data?.message || "Failed to add gym");
+      toast.error(error.response?.data?.message || "Không thể thêm phòng gym");
     } finally {
       setLoadingAdd(false);
     }
@@ -221,233 +342,551 @@ export default function ManageGymPage() {
     });
   };
 
-  if (!isLoaded) return <div>Loading Map...</div>;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-50">
+        <Spin
+          indicator={
+            <LoadingOutlined style={{ fontSize: 48, color: "#FF914D" }} spin />
+          }
+          tip="Đang tải dữ liệu..."
+          size="large"
+        />
+      </div>
+    );
+  }
+
+  if (!isLoaded) {
+    return (
+      <div className="">
+        <Spin tip="Đang tải bản đồ..." size="large" />
+      </div>
+    );
+  }
 
   return (
     <div className="">
-      <ConfigProvider
-        theme={{ components: { Table: { headerBg: "#FFE5E9" } } }}
-      >
-        <div className="flex justify-end items-center mb-6">
-          <Input
-            placeholder="Tìm kiếm theo tên phòng gym"
-            prefix={<SearchOutlined />}
-            onChange={(e) => setSearchText(e.target.value)}
-            style={{ width: 250 }}
-            allowClear
-          />
-          <Button
-            icon={<FaPlus />}
-            className="ml-4"
-            color="blue"
-            variant="solid"
-            onClick={() => setIsModalAddGymOpen(true)}
+      <div className="">
+        {/* Header */}
+        <div className="">
+          <Title
+            level={2}
+            className="text-gray-900 mb-2 flex items-center gap-3"
           >
-            Thêm Phòng Gym
-          </Button>
+            <FaDumbbell className="text-orange-500" />
+            Quản Lý Phòng Gym
+          </Title>
+          <Text className="text-gray-600 text-base">
+            Quản lý và theo dõi thông tin các phòng gym trong hệ thống
+          </Text>
         </div>
-        <Table
-          rowKey="id"
-          dataSource={filteredData}
-          columns={columns}
-          pagination={{
-            current: pagination.current,
-            pageSize: pagination.pageSize,
-            total: pagination.total,
-            showSizeChanger: false,
-            position: ["bottomCenter"],
-          }}
-          onChange={handleTableChange}
-        />
-      </ConfigProvider>
 
+        {/* Statistics Cards */}
+        <Row gutter={[20, 20]} className="mb-8">
+          <Col xs={24} sm={12} lg={6}>
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-blue-50 to-blue-100">
+              <Statistic
+                title={
+                  <span className="text-gray-600 font-medium">
+                    Tổng Số Phòng Gym
+                  </span>
+                }
+                value={statistics.totalGyms}
+                prefix={<HomeOutlined className="text-blue-500" />}
+                valueStyle={{
+                  color: "#1890ff",
+                  fontSize: "28px",
+                  fontWeight: "bold",
+                }}
+              />
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-red-50 to-red-100">
+              <Statistic
+                title={
+                  <span className="text-gray-600 font-medium">
+                    Hot Research
+                  </span>
+                }
+                value={statistics.hotResearchGyms}
+                prefix={<FireOutlined className="text-red-500" />}
+                valueStyle={{
+                  color: "#ff4d4f",
+                  fontSize: "28px",
+                  fontWeight: "bold",
+                }}
+              />
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-green-50 to-green-100">
+              <Statistic
+                title={
+                  <span className="text-gray-600 font-medium">
+                    Phòng Gym Thường
+                  </span>
+                }
+                value={statistics.normalGyms}
+                prefix={<BankOutlined className="text-green-500" />}
+                valueStyle={{
+                  color: "#52c41a",
+                  fontSize: "28px",
+                  fontWeight: "bold",
+                }}
+              />
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-orange-50 to-orange-100">
+              <Statistic
+                title={
+                  <span className="text-gray-600 font-medium">
+                    Năm TB Hoạt Động
+                  </span>
+                }
+                value={statistics.averageYear}
+                prefix={<CalendarOutlined className="text-orange-500" />}
+                valueStyle={{
+                  color: "#FF914D",
+                  fontSize: "28px",
+                  fontWeight: "bold",
+                }}
+              />
+            </Card>
+          </Col>
+        </Row>
+
+        {/* Main Content */}
+        <Card className="border-0 shadow-xl">
+          <ConfigProvider
+            theme={{
+              components: {
+                Table: {
+                  headerBg: "linear-gradient(90deg, #FFE5E9 0%, #FFF0F2 100%)",
+                  headerColor: "#333",
+                  rowHoverBg: "#FFF9FA",
+                },
+              },
+            }}
+          >
+            {/* Controls */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+              <div className="flex-1 max-w-md">
+                <Input
+                  placeholder="Tìm kiếm theo tên gym, địa chỉ, người đại diện..."
+                  prefix={<SearchOutlined className="text-gray-400" />}
+                  onChange={(e) => setSearchText(e.target.value)}
+                  allowClear
+                  size="large"
+                  className="rounded-lg shadow-sm"
+                />
+              </div>
+
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                size="large"
+                className="bg-gradient-to-r from-orange-400 to-orange-600 border-0 rounded-lg px-6 shadow-lg hover:shadow-xl transition-all duration-300"
+                onClick={() => setIsModalAddGymOpen(true)}
+              >
+                Thêm Phòng Gym
+              </Button>
+            </div>
+
+            {/* Results Summary */}
+            <div className="mb-4 p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg border">
+              <Text className="text-gray-600">
+                Hiển thị{" "}
+                <span className="font-semibold text-orange-600">
+                  {filteredData.length}
+                </span>{" "}
+                trong tổng số{" "}
+                <span className="font-semibold">{statistics.totalGyms}</span>{" "}
+                phòng gym
+                {searchText && (
+                  <span className="ml-2">
+                    | Tìm kiếm: "
+                    <span className="font-semibold text-blue-600">
+                      {searchText}
+                    </span>
+                    "
+                  </span>
+                )}
+              </Text>
+            </div>
+
+            {/* Table */}
+            <Table
+              rowKey="id"
+              dataSource={filteredData}
+              columns={columns}
+              pagination={{
+                current: pagination.current,
+                pageSize: pagination.pageSize,
+                total: pagination.total,
+                showSizeChanger: true,
+                showQuickJumper: true,
+                showTotal: (total, range) =>
+                  `${range[0]}-${range[1]} của ${total} mục`,
+                position: ["bottomCenter"],
+              }}
+              onChange={handleTableChange}
+              className="rounded-lg overflow-hidden"
+              scroll={{ x: 1000 }}
+              size="middle"
+            />
+          </ConfigProvider>
+        </Card>
+      </div>
+
+      {/* Add Gym Modal */}
       <Modal
         open={isModalAddGymOpen}
-        onCancel={() => setIsModalAddGymOpen(false)}
+        onCancel={() => {
+          setIsModalAddGymOpen(false);
+          formAdd.resetFields();
+          setPosition(null);
+        }}
         title={
-          <p className="text-2xl font-bold text-[#ED2A46] flex items-center gap-2">
-            <IoBarbell />
-            Thêm Phòng Gym
-          </p>
+          <div className="flex items-center gap-3 pb-4 border-b">
+            <div className="w-10 h-10 bg-gradient-to-r from-orange-400 to-red-500 rounded-full flex items-center justify-center">
+              <IoBarbell className="text-white text-lg" />
+            </div>
+            <div>
+              <Title level={3} className="m-0 text-gray-800">
+                Thêm Phòng Gym Mới
+              </Title>
+              <Text className="text-gray-500">
+                Điền thông tin để thêm phòng gym vào hệ thống
+              </Text>
+            </div>
+          </div>
         }
         footer={null}
-        width={700}
+        width={800}
+        className="custom-modal"
       >
         <Form
           form={formAdd}
           layout="vertical"
           requiredMark={false}
           onFinish={handleAddGym}
-          className="max-h-[65vh] overflow-y-auto !py-5 !px-15"
+          className="max-h-[70vh] overflow-y-auto py-6"
         >
-          <Form.Item
-            label={
-              <p className="text-xl font-bold text-[#ED2A46]">Số điện thoại</p>
-            }
-            name="phone"
-            rules={[
-              {
-                required: true,
-                message: "Vui lòng nhập số điện thoại",
-              },
-              {
-                pattern: /^[0-9]+$/,
-                message: "Vui lòng chỉ nhập số",
-              },
-            ]}
-          >
-            <Input
-              placeholder="09XXXXXXXX"
-              type="tel"
-              maxLength={10}
-              onKeyPress={(event) => {
-                if (!/[0-9]/.test(event.key)) {
-                  event.preventDefault();
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label={
+                  <span className="font-semibold text-gray-700">
+                    Số điện thoại
+                  </span>
                 }
-              }}
-            />
-          </Form.Item>
-
-          <Form.Item
-            label={<p className="text-xl font-bold text-[#ED2A46]">Email</p>}
-            name="email"
-            rules={[{ required: true, message: "Vui lòng nhập email" }]}
-          >
-            <Input placeholder="nguyenvana123@email.com" />
-          </Form.Item>
+                name="phone"
+                rules={[
+                  { required: true, message: "Vui lòng nhập số điện thoại" },
+                  { pattern: /^[0-9]+$/, message: "Vui lòng chỉ nhập số" },
+                ]}
+              >
+                <Input
+                  prefix={<PhoneOutlined className="text-gray-400" />}
+                  placeholder="09XXXXXXXX"
+                  maxLength={10}
+                  size="large"
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label={
+                  <span className="font-semibold text-gray-700">Email</span>
+                }
+                name="email"
+                rules={[
+                  { required: true, message: "Vui lòng nhập email" },
+                  { type: "email", message: "Email không hợp lệ" },
+                ]}
+              >
+                <Input
+                  prefix={<GlobalOutlined className="text-gray-400" />}
+                  placeholder="example@email.com"
+                  size="large"
+                />
+              </Form.Item>
+            </Col>
+          </Row>
 
           <Form.Item
             label={
-              <p className="text-xl font-bold text-[#ED2A46]">
-                Mật Khẩu Phòng Gym
-              </p>
+              <span className="font-semibold text-gray-700">Mật khẩu</span>
             }
             name="password"
-            rules={[
-              {
-                required: true,
-                message: "Vui lòng nhập mật khẩu cho phòng Gym!",
-              },
-            ]}
+            rules={[{ required: true, message: "Vui lòng nhập mật khẩu" }]}
           >
-            <Input placeholder="*******" type="password" />
+            <Input.Password placeholder="Nhập mật khẩu" size="large" />
           </Form.Item>
 
-          <Form.Item
-            label={
-              <p className="text-xl font-bold text-[#ED2A46]">Tên Phòng Gym</p>
-            }
-            name="gymName"
-            rules={[
-              { required: true, message: "Vui lòng nhập tên phòng gym!" },
-            ]}
-          >
-            <Input placeholder="Phòng Gym" />
-          </Form.Item>
+          <Divider />
+
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label={
+                  <span className="font-semibold text-gray-700">
+                    Tên Phòng Gym
+                  </span>
+                }
+                name="gymName"
+                rules={[
+                  { required: true, message: "Vui lòng nhập tên phòng gym" },
+                ]}
+              >
+                <Input
+                  prefix={<FaDumbbell className="text-gray-400" />}
+                  placeholder="Tên phòng gym"
+                  size="large"
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label={
+                  <span className="font-semibold text-gray-700">
+                    Hoạt động từ năm
+                  </span>
+                }
+                name="since"
+                rules={[
+                  { required: true, message: "Vui lòng nhập năm hoạt động" },
+                ]}
+              >
+                <Input
+                  prefix={<CalendarOutlined className="text-gray-400" />}
+                  placeholder="2025"
+                  type="number"
+                  size="large"
+                />
+              </Form.Item>
+            </Col>
+          </Row>
 
           <Form.Item
-            label={
-              <p className="text-xl font-bold text-[#ED2A46]">Hoạt động từ</p>
-            }
-            name="since"
-            rules={[{ required: true, message: "Bắt buộc nhập hoạt động từ" }]}
-          >
-            <Input placeholder="2025" type="number" />
-          </Form.Item>
-
-          <Form.Item
-            label={<p className="text-xl font-bold text-[#ED2A46]">Địa chỉ</p>}
+            label={<span className="font-semibold text-gray-700">Địa chỉ</span>}
             name="address"
-            rules={[{ required: true, message: "Bắt buộc nhập địa chỉ" }]}
+            rules={[{ required: true, message: "Vui lòng nhập địa chỉ" }]}
           >
-            <Input placeholder="123 Nguyễn Văn Linh, Hanoi" />
-          </Form.Item>
-
-          <Form.Item
-            label={
-              <p className="text-xl font-bold text-[#ED2A46]">
-                Tên Người Đại Diện
-              </p>
-            }
-            name="representName"
-            rules={[
-              { required: true, message: "Bắt buộc nhập tên người đại diện" },
-            ]}
-          >
-            <Input placeholder="Nguyễn Văn A" />
-          </Form.Item>
-
-          <Form.Item
-            label={
-              <p className="text-xl font-bold text-[#ED2A46]">Mã Số Thuế</p>
-            }
-            name="taxCode"
-            rules={[{ required: true, message: "Bắt buộc nhập mã số thuế" }]}
-          >
-            <Input placeholder="ABC1234" />
-          </Form.Item>
-
-          <Form.Item
-            label={<p className="text-xl font-bold text-[#ED2A46]">Kinh Độ</p>}
-            name="longitude"
-            rules={[{ required: true, message: "Bắt buộc nhập kinh độ" }]}
-          >
-            <Input placeholder="25.80.234" type="number" />
-          </Form.Item>
-
-          <Form.Item
-            label={<p className="text-xl font-bold text-[#ED2A46]">Vĩ Độ</p>}
-            name="latitude"
-            rules={[{ required: true, message: "Bắt buộc nhập vĩ độ" }]}
-          >
-            <Input placeholder="25.80.234" type="number" />
-          </Form.Item>
-
-          <GoogleMap
-            mapContainerStyle={containerStyle}
-            center={center}
-            zoom={13}
-            onClick={handleMapClick}
-          >
-            {position && <Marker position={position} />}
-          </GoogleMap>
-
-          <Form.Item
-            label={<p className="text-xl font-bold text-[#ED2A46]">QR Code</p>}
-            name="qrcode"
-            rules={[{ required: true, message: "Bắt buộc QR code" }]}
-          >
-            <Input placeholder="QR123456" />
-          </Form.Item>
-
-          <Form.Item
-            label={
-              <p className="text-xl font-bold text-[#ED2A46]">Hot Research</p>
-            }
-            name="hotResearch"
-            valuePropName="checked"
-            defaultValue={false}
-          >
-            <Switch
-              checkedChildren="Bật"
-              unCheckedChildren="Tắt"
+            <Input
+              prefix={<EnvironmentOutlined className="text-gray-400" />}
+              placeholder="123 Nguyễn Văn Linh, TP.HCM"
               size="large"
             />
           </Form.Item>
 
-          <div className="text-center">
-            <Button
-              onClick={() => formAdd.submit()}
-              loading={loadingAdd}
-              color="orange"
-              variant="solid"
-              className="!w-[50%] !rounded-full !h-10 !font-medium !border-0 shadow-2xl"
-            >
-              Gửi Thông Tin
-            </Button>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label={
+                  <span className="font-semibold text-gray-700">
+                    Tên người đại diện
+                  </span>
+                }
+                name="representName"
+                rules={[
+                  {
+                    required: true,
+                    message: "Vui lòng nhập tên người đại diện",
+                  },
+                ]}
+              >
+                <Input
+                  prefix={<UserOutlined className="text-gray-400" />}
+                  placeholder="Nguyễn Văn A"
+                  size="large"
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label={
+                  <span className="font-semibold text-gray-700">
+                    Mã số thuế
+                  </span>
+                }
+                name="taxCode"
+                rules={[
+                  { required: true, message: "Vui lòng nhập mã số thuế" },
+                ]}
+              >
+                <Input
+                  prefix={<BankOutlined className="text-gray-400" />}
+                  placeholder="ABC1234567"
+                  size="large"
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label={
+                  <span className="font-semibold text-gray-700">Kinh độ</span>
+                }
+                name="longitude"
+                rules={[{ required: true, message: "Vui lòng nhập kinh độ" }]}
+              >
+                <Input
+                  placeholder="106.660172"
+                  type="number"
+                  step="any"
+                  size="large"
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label={
+                  <span className="font-semibold text-gray-700">Vĩ độ</span>
+                }
+                name="latitude"
+                rules={[{ required: true, message: "Vui lòng nhập vĩ độ" }]}
+              >
+                <Input
+                  placeholder="10.762622"
+                  type="number"
+                  step="any"
+                  size="large"
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <div className="mb-4">
+            <Text className="font-semibold text-gray-700 block mb-2">
+              Chọn vị trí trên bản đồ (tùy chọn)
+            </Text>
+            <div className="border rounded-lg overflow-hidden shadow-sm">
+              <GoogleMap
+                mapContainerStyle={containerStyle}
+                center={center}
+                zoom={13}
+                onClick={handleMapClick}
+                options={{
+                  styles: [
+                    {
+                      featureType: "poi",
+                      elementType: "labels",
+                      stylers: [{ visibility: "off" }],
+                    },
+                  ],
+                }}
+              >
+                {position && (
+                  <Marker
+                    position={position}
+                    animation={window.google?.maps?.Animation?.BOUNCE}
+                  />
+                )}
+              </GoogleMap>
+            </div>
+            <Text className="text-gray-500 text-sm mt-2">
+              Nhấp vào bản đồ để chọn vị trí chính xác của phòng gym
+            </Text>
+          </div>
+
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label={
+                  <span className="font-semibold text-gray-700">QR Code</span>
+                }
+                name="qrcode"
+                rules={[{ required: true, message: "Vui lòng nhập QR code" }]}
+              >
+                <Input
+                  prefix={<QrcodeOutlined className="text-gray-400" />}
+                  placeholder="QR123456"
+                  size="large"
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label={
+                  <span className="font-semibold text-gray-700">
+                    Hot Research
+                  </span>
+                }
+                name="hotResearch"
+                valuePropName="checked"
+              >
+                <div className="flex items-center gap-3 mt-2">
+                  <Switch
+                    checkedChildren={<FireOutlined />}
+                    unCheckedChildren="OFF"
+                    size="default"
+                  />
+                  <Text className="text-gray-500">
+                    Đánh dấu là phòng gym nổi bật
+                  </Text>
+                </div>
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <div className="text-center pt-6 border-t mt-6">
+            <Space size="middle">
+              <Button
+                size="large"
+                onClick={() => {
+                  setIsModalAddGymOpen(false);
+                  formAdd.resetFields();
+                  setPosition(null);
+                }}
+                className="px-8"
+              >
+                Hủy
+              </Button>
+              <Button
+                type="primary"
+                size="large"
+                loading={loadingAdd}
+                onClick={() => formAdd.submit()}
+                className="bg-gradient-to-r from-orange-400 to-orange-600 border-0 px-8 shadow-lg"
+              >
+                {loadingAdd ? "Đang thêm..." : "Thêm Phòng Gym"}
+              </Button>
+            </Space>
           </div>
         </Form>
       </Modal>
+
+      <style jsx global>{`
+        .custom-modal .ant-modal-header {
+          border-bottom: none;
+          padding: 24px 24px 0;
+        }
+        .custom-modal .ant-modal-body {
+          padding: 0 24px 24px;
+        }
+        .ant-table-thead > tr > th {
+          font-weight: 600;
+          color: #374151;
+        }
+        .ant-pagination-item-active {
+          background: #ff914d !important;
+          border-color: #ff914d !important;
+        }
+        .ant-pagination-item-active a {
+          color: white !important;
+        }
+        .ant-pagination-item:hover {
+          border-color: #ff914d !important;
+        }
+        .ant-pagination-item:hover a {
+          color: #ff914d !important;
+        }
+      `}</style>
     </div>
   );
 }
