@@ -68,6 +68,11 @@ export default function SidebarAdmin() {
           <GiGymBag />
         ),
         getItem(
+          "Quản Lý Giao Dịch",
+          `${route.admin}/${route.manageTransaction}`,
+          <GrTransaction />
+        ),
+        getItem(
           "Thông Báo",
           `${route.admin}/${route.manageNotification}`,
           <NotificationOutlined />
