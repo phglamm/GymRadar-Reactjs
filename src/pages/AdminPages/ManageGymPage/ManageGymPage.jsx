@@ -6,7 +6,6 @@ import {
   Input,
   Modal,
   Space,
-  Spin,
   Switch,
   Table,
   Row,
@@ -18,6 +17,7 @@ import {
   Avatar,
   Typography,
   Divider,
+  Spin,
 } from "antd";
 import React, { useEffect, useState } from "react";
 import adminService from "../../../services/adminServices";
@@ -352,14 +352,6 @@ export default function ManageGymPage() {
           tip="Đang tải dữ liệu..."
           size="large"
         />
-      </div>
-    );
-  }
-
-  if (!isLoaded) {
-    return (
-      <div className="">
-        <Spin tip="Đang tải bản đồ..." size="large" />
       </div>
     );
   }

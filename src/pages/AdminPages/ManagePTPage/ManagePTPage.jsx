@@ -378,15 +378,6 @@ export default function ManagePTPage() {
                 <Option value="busy">Bận</Option>
               </Select>
             </div>
-
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              className="bg-gradient-to-r from-orange-400 to-orange-600 border-0 rounded-lg px-6 py-2 h-auto"
-              onClick={() => console.log("Add new PT")}
-            >
-              Thêm PT Mới
-            </Button>
           </div>
 
           {/* Results Summary */}
