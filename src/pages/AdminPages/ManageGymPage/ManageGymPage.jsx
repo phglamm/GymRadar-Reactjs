@@ -319,7 +319,6 @@ export default function ManageGymPage() {
     formData.append("CreateNewGym.TaxCode", values.taxCode || "");
     formData.append("CreateNewGym.Longitude", values.longitude || 0);
     formData.append("CreateNewGym.Latitude", values.latitude || 0);
-    formData.append("CreateNewGym.Qrcode", values.qrcode || "");
 
     // Handle hotResearch boolean
 
@@ -810,24 +809,6 @@ export default function ManageGymPage() {
               Nhấp vào bản đồ để chọn vị trí chính xác của phòng gym
             </Text>
           </div>
-
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                label={
-                  <span className="font-semibold text-gray-700">QR Code</span>
-                }
-                name="qrcode"
-                rules={[{ required: true, message: "Vui lòng nhập QR code" }]}
-              >
-                <Input
-                  prefix={<QrcodeOutlined className="text-gray-400" />}
-                  placeholder="QR123456"
-                  size="large"
-                />
-              </Form.Item>
-            </Col>
-          </Row>
 
           {/* Main Image Upload */}
           <Form.Item
