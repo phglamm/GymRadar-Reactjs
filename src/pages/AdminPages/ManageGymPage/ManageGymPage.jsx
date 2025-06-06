@@ -18,6 +18,7 @@ import {
   Typography,
   Divider,
   Spin,
+  Upload,
 } from "antd";
 import React, { useEffect, useState } from "react";
 import adminService from "../../../services/adminServices";
@@ -58,6 +59,8 @@ export default function ManageGymPage() {
     pageSize: 10,
     total: 0,
   });
+  const [mainImageList, setMainImageList] = useState({});
+  const [imagesList, setImagesList] = useState([]);
   const [position, setPosition] = useState(null);
   const [statistics, setStatistics] = useState({
     totalGyms: 0,
@@ -300,30 +303,50 @@ export default function ManageGymPage() {
 
   const handleAddGym = async (values) => {
     setLoadingAdd(true);
-    const requestData = {
-      phone: values.phone,
-      email: values.email,
-      password: values.password,
-      createNewGym: {
-        gymName: values.gymName,
-        since: values.since,
-        address: values.address,
-        representName: values.representName,
-        taxCode: values.taxCode,
-        longitude: values.longitude,
-        latitude: values.latitude,
-        qrcode: values.qrcode,
-        hotResearch: values.hotResearch,
-      },
-    };
+
+    const formData = new FormData();
+
+    // Add basic user fields
+    formData.append("Phone", values.phone || "");
+    formData.append("Email", values.email || "");
+    formData.append("Password", values.password || "");
+
+    // Add gym-specific fields with corrected naming
+    formData.append("CreateNewGym.GymName", values.gymName || "");
+    formData.append("CreateNewGym.Since", values.since || 0);
+    formData.append("CreateNewGym.Address", values.address || "");
+    formData.append("CreateNewGym.RepresentName", values.representName || "");
+    formData.append("CreateNewGym.TaxCode", values.taxCode || "");
+    formData.append("CreateNewGym.Longitude", values.longitude || 0);
+    formData.append("CreateNewGym.Latitude", values.latitude || 0);
+    formData.append("CreateNewGym.Qrcode", values.qrcode || "");
+
+    // Handle hotResearch boolean
+
+    // Handle main image file (single object) - modified to handle object instead of array
+    if (values.mainImage && values.mainImage.originFileObj) {
+      formData.append("CreateNewGym.MainImage", values.mainImage.originFileObj);
+    }
+
+    // Handle multiple images array
+    if (values.images && values.images.length > 0) {
+      values.images.forEach((file, index) => {
+        if (file.originFileObj) {
+          formData.append("CreateNewGym.Images", file.originFileObj);
+        }
+      });
+    }
 
     try {
-      await adminService.addGym(requestData);
+      const response = await adminService.addGym(formData);
+      console.log("Add Gym Response Data:", response);
       toast.success("Thêm phòng gym thành công!");
       fetchGym();
       setIsModalAddGymOpen(false);
       formAdd.resetFields();
       setPosition(null);
+      setMainImageList({});
+      setImagesList([]);
     } catch (error) {
       toast.error(error.response?.data?.message || "Không thể thêm phòng gym");
     } finally {
@@ -539,6 +562,8 @@ export default function ManageGymPage() {
           setIsModalAddGymOpen(false);
           formAdd.resetFields();
           setPosition(null);
+          setMainImageList({});
+          setImagesList([]);
         }}
         title={
           <div className="flex items-center gap-3 pb-4 border-b">
@@ -556,7 +581,7 @@ export default function ManageGymPage() {
           </div>
         }
         footer={null}
-        width={800}
+        width={900}
         className="custom-modal"
       >
         <Form
@@ -802,29 +827,67 @@ export default function ManageGymPage() {
                 />
               </Form.Item>
             </Col>
-            <Col span={12}>
-              <Form.Item
-                label={
-                  <span className="font-semibold text-gray-700">
-                    Hot Research
-                  </span>
-                }
-                name="hotResearch"
-                valuePropName="checked"
-              >
-                <div className="flex items-center gap-3 mt-2">
-                  <Switch
-                    checkedChildren={<FireOutlined />}
-                    unCheckedChildren="OFF"
-                    size="default"
-                  />
-                  <Text className="text-gray-500">
-                    Đánh dấu là phòng gym nổi bật
-                  </Text>
-                </div>
-              </Form.Item>
-            </Col>
           </Row>
+
+          {/* Main Image Upload */}
+          <Form.Item
+            label={
+              <span className="font-semibold text-gray-700">
+                Ảnh đại diện phòng gym
+              </span>
+            }
+            name="mainImage"
+            rules={[
+              { required: true, message: "Vui lòng tải lên ảnh đại diện" },
+            ]}
+          >
+            <Upload
+              listType="picture-card"
+              fileList={mainImageList ? [mainImageList] : []}
+              onChange={({ fileList }) => {
+                const latestFile = fileList[fileList.length - 1] || null;
+                setMainImageList(latestFile); // Set as single object instead of array
+                formAdd.setFieldsValue({ mainImage: latestFile });
+              }}
+              beforeUpload={() => false} // Prevent auto upload
+              accept="image/*"
+              maxCount={1}
+            >
+              {!mainImageList && (
+                <div>
+                  <PlusOutlined />
+                  <div style={{ marginTop: 8 }}>Tải lên</div>
+                </div>
+              )}
+            </Upload>
+          </Form.Item>
+
+          {/* Multiple Images Upload */}
+          <Form.Item
+            label={
+              <span className="font-semibold text-gray-700">
+                Ảnh bổ sung phòng gym
+              </span>
+            }
+            name="images"
+          >
+            <Upload
+              listType="picture-card"
+              fileList={imagesList}
+              onChange={({ fileList }) => {
+                setImagesList(fileList);
+                formAdd.setFieldsValue({ images: fileList });
+              }}
+              beforeUpload={() => false} // Prevent auto upload
+              accept="image/*"
+              multiple
+            >
+              <div>
+                <PlusOutlined />
+                <div style={{ marginTop: 8 }}>Tải lên</div>
+              </div>
+            </Upload>
+          </Form.Item>
 
           <div className="text-center pt-6 border-t mt-6">
             <Space size="middle">
@@ -834,6 +897,8 @@ export default function ManageGymPage() {
                   setIsModalAddGymOpen(false);
                   formAdd.resetFields();
                   setPosition(null);
+                  setMainImageList([]);
+                  setImagesList([]);
                 }}
                 className="px-8"
               >
