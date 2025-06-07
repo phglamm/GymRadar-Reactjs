@@ -44,6 +44,7 @@ import { ImBin } from "react-icons/im";
 import { MdEdit, MdLocationOn } from "react-icons/md";
 import { IoBarbell, IoLocationSharp } from "react-icons/io5";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
+import addGymService from "../../../services/addGymService";
 
 const { Title, Text } = Typography;
 
@@ -338,7 +339,7 @@ export default function ManageGymPage() {
     }
 
     try {
-      const response = await adminService.addGym(formData);
+      const response = await addGymService.addGym(formData);
       console.log("Add Gym Response Data:", response);
       toast.success("Thêm phòng gym thành công!");
       fetchGym();

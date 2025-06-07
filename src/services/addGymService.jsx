@@ -6,19 +6,12 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const request = async (method, url, data = null, headers = {}, params = {}) => {
   try {
-    const accessToken = Cookies.get("token")?.replaceAll('"', "");
-
-    const authHeaders = accessToken
-      ? { Authorization: `Bearer ${accessToken}` }
-      : {};
-
     const response = await axios({
       method,
       url: `${API_BASE_URL}${url}`,
       data,
       params,
       headers: {
-        ...authHeaders,
         ...headers,
       },
     });
@@ -30,10 +23,8 @@ const request = async (method, url, data = null, headers = {}, params = {}) => {
   }
 };
 
-const adminService = {
-  getAllGym: (params) => request("GET", "v1/gym", null, {}, params),
-
-  getAllPT: (params) => request("GET", "v1/admin/get-pt", null, {}, params),
+const addGymService = {
+  addGym: (data) => request("POST", "v1/gym", data),
 };
 
-export default adminService;
+export default addGymService;
