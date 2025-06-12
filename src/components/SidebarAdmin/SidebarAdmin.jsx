@@ -21,6 +21,7 @@ import { FaRegCalendarCheck } from "react-icons/fa";
 import { GrTransaction } from "react-icons/gr";
 import { LiaFileContractSolid } from "react-icons/lia";
 import { GiGymBag } from "react-icons/gi";
+import ManagePremiumPage from "../../pages/AdminPages/ManagePremiumPage/ManagePremiumPage";
 
 export default function SidebarAdmin() {
   function getItem(label, key, icon, children) {
@@ -71,6 +72,11 @@ export default function SidebarAdmin() {
           "Quản Lý Giao Dịch",
           `${route.admin}/${route.manageTransaction}`,
           <GrTransaction />
+        ),
+        getItem(
+          "Quản Lý Gói Premium",
+          `${route.admin}/manage-premium`,
+          <DropboxOutlined />
         ),
         getItem(
           "Thông Báo",

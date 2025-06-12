@@ -25,6 +25,7 @@ import ManageGymPackages from "./pages/GymPages/ManageGymPackages/ManageGymPacka
 import ManageSlotGym from "./pages/GymPages/ManageSlotGym/ManageSlotGym";
 import OrderProcessPage from "./pages/OrderProcessPage/OrderProcessPage";
 import ManageTransactionPage from "./pages/AdminPages/ManageTransactionPage/ManageTransactionPage";
+import ManagePremiumPage from "./pages/AdminPages/ManagePremiumPage/ManagePremiumPage";
 function App() {
   const router = createBrowserRouter([
     {
@@ -68,6 +69,10 @@ function App() {
         {
           path: route.manageTransaction,
           element: <ManageTransactionPage />,
+        },
+        {
+          path: `manage-premium`,
+          element: <ManagePremiumPage />,
         },
       ],
     },
