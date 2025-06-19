@@ -14,6 +14,9 @@ const gymService = {
 
   addPTToCourse: (data) => request("POST", "v1/course-pt", data),
   getPTOfCourse: (id) => request("GET", `v1/course/${id}/pts`, null, {}),
+
+  getRevenueOfGym: (params) =>
+    request("GET", "v1/gym/me/dashboard", null, {}, params),
 };
 
 export default gymService;

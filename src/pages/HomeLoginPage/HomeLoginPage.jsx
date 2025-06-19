@@ -36,7 +36,7 @@ export default function HomeLoginPage() {
       if (response.data.role === "ADMIN") {
         navigate(`${route.admin}/${route.dashboard}`);
       } else if (response.data.role === "GYM") {
-        navigate(`${route.admin}/${route.dashboard}`);
+        navigate(`${route.gym}/${route.dashboardGym}`);
       } else {
         toast.error("Tài khoản không có quyền truy cập");
         return;

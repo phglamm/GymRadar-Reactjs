@@ -11,7 +11,7 @@ export default function AdminLayout() {
 
   return (
     <>
-      <Layout className="!min-h-screen">
+      <Layout className="!min-h-screen  !bg-[#1D1D1D]">
         <SidebarAdmin />
         <Layout className="!bg-[#ffffff]">
           <HeaderAdmin />

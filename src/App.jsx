@@ -42,7 +42,6 @@ function App() {
       element: <AdminLayout />,
       children: [
         {
-          index: true,
           path: route.dashboard,
           element: <DashboardPage />,
         },
@@ -81,7 +80,6 @@ function App() {
       element: <AdminLayout />,
       children: [
         {
-          index: true,
           path: route.dashboardGym,
           element: <DashboardGym />,
         },

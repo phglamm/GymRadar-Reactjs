@@ -154,7 +154,7 @@ export default function SidebarAdmin() {
         <div className="items-center flex justify-center">
           <img src={logo} alt="Logo" className="w-[50%]" />
         </div>
-        <div className="text-[#ED2A46] text-center font-semibold text-lg py-4 px-6 border-b border-gray-700">
+        <div className="text-[2A46] text-center font-semibold text-lg py-4 px-6 border-b border-gray-700">
           {collapsed ? "🌐" : "GymRadar"}
         </div>
         <Menu
