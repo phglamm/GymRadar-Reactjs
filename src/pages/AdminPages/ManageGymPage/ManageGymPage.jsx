@@ -452,24 +452,6 @@ export default function ManageGymPage() {
               />
             </Card>
           </Col>
-          <Col xs={24} sm={12} lg={6}>
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-orange-50 to-orange-100">
-              <Statistic
-                title={
-                  <span className="text-gray-600 font-medium">
-                    Năm TB Hoạt Động
-                  </span>
-                }
-                value={statistics.averageYear}
-                prefix={<CalendarOutlined className="text-orange-500" />}
-                valueStyle={{
-                  color: "#FF914D",
-                  fontSize: "28px",
-                  fontWeight: "bold",
-                }}
-              />
-            </Card>
-          </Col>
         </Row>
 
         {/* Main Content */}

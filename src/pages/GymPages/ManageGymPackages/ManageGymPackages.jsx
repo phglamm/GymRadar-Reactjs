@@ -280,17 +280,21 @@ export default function ManageGymPackages() {
               }}
             />
           </Tooltip>
-          <Tooltip title="Thêm PT">
-            <Button
-              type="text"
-              icon={<UserAddOutlined />}
-              className="text-green-600 hover:bg-green-50"
-              onClick={() => {
-                setIsModalAddGymCoursePTOpen(true);
-                setSelectedCourse(record);
-              }}
-            />
-          </Tooltip>
+
+          {record.type === "WithPT" && (
+            <Tooltip title="Thêm PT">
+              <Button
+                type="text"
+                icon={<UserAddOutlined />}
+                className="text-green-600 hover:bg-green-50"
+                onClick={() => {
+                  setIsModalAddGymCoursePTOpen(true);
+                  setSelectedCourse(record);
+                }}
+              />
+            </Tooltip>
+          )}
+
           <Tooltip title="Chỉnh sửa">
             <Button
               type="text"

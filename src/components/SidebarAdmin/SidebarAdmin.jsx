@@ -89,11 +89,11 @@ export default function SidebarAdmin({ collapsed, onCollapse }) {
           `${route.gym}/${route.dashboardGym}`,
           <BarChartOutlined className="text-lg" />
         ),
-        getItem(
-          "Thông Tin Phòng Tập",
-          `${route.gym}/${route.manageinformationGym}`,
-          <FaDumbbell className="text-lg" />
-        ),
+        // getItem(
+        //   "Thông Tin Phòng Tập",
+        //   `${route.gym}/${route.manageinformationGym}`,
+        //   <FaDumbbell className="text-lg" />
+        // ),
         getItem(
           "Quản Lý PT",
           `${route.gym}/${route.managePTGym}`,
