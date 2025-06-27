@@ -61,11 +61,11 @@ export default function SidebarAdmin({ collapsed, onCollapse }) {
           `${route.admin}/${route.managePT}`,
           <GiTeacher className="text-lg" />
         ),
-        getItem(
-          "Quản Lý Gói Tập",
-          `${route.admin}/${route.managePackages}`,
-          <GiGymBag className="text-lg" />
-        ),
+        // getItem(
+        //   "Quản Lý Gói Tập",
+        //   `${route.admin}/${route.managePackages}`,
+        //   <GiGymBag className="text-lg" />
+        // ),
         getItem(
           "Quản Lý Giao Dịch",
           `${route.admin}/${route.manageTransaction}`,

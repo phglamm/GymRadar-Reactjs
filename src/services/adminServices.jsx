@@ -11,6 +11,12 @@ const adminService = {
 
   getRevenueData: (params) =>
     request("GET", "v1/dashboard/profit", null, {}, params),
+
+  getAllUsers: (params) => request("GET", "v1/user", null, {}, params),
+
+  banUser: (id) => request("PUT", `v1/user/${id}/ban`),
+
+  deleteUser: (id) => request("DELETE", `v1/user/${id}`),
 };
 
 export default adminService;
