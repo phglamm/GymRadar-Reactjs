@@ -206,6 +206,12 @@ export default function ManagePTGym() {
       ),
     },
     {
+      title: "Số điện thoại",
+      dataIndex: "phone",
+      key: "phone",
+      align: "center",
+    },
+    {
       title: "Khách Hàng",
       dataIndex: "clientCount",
       key: "clientCount",
