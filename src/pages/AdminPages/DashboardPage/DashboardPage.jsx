@@ -289,7 +289,7 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600 mb-1">
-                  Thu Nhập Giao Dịch (10%)
+                  Thu Nhập Giao Dịch
                 </p>
                 <p className="text-2xl font-bold text-gray-900">
                   {formatVND(totalTransactionIncome)}
@@ -328,6 +328,9 @@ export default function DashboardPage() {
                     Ngày
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Tổng giao dịch
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Thu Nhập Đăng Ký
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -346,6 +349,9 @@ export default function DashboardPage() {
                   <tr key={index} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {dayjs(item.date).format("DD/MM/YYYY")}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {item.totalTransactions}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {formatVND(item.subscriptionIncome || 0)}

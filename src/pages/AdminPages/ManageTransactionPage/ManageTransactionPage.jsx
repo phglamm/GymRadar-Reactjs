@@ -225,22 +225,22 @@ export default function ManageTransactionPage() {
         </Tooltip>
       ),
     },
-    {
-      title: "Khách Hàng",
-      key: "customer",
-      align: "center",
-      width: 200,
-      render: (record) => (
-        <div>
-          <div className="font-medium">
-            {record.user?.fullName || "Chưa có thông tin"}
-          </div>
-          <div className="text-xs text-gray-500">
-            {record.user?.email || "Chưa có email"}
-          </div>
-        </div>
-      ),
-    },
+    // {
+    //   title: "Khách Hàng",
+    //   key: "customer",
+    //   align: "center",
+    //   width: 200,
+    //   render: (record) => (
+    //     <div>
+    //       <div className="font-medium">
+    //         {record.user?.fullName || "Chưa có thông tin"}
+    //       </div>
+    //       <div className="text-xs text-gray-500">
+    //         {record.user?.email || "Chưa có email"}
+    //       </div>
+    //     </div>
+    //   ),
+    // },
     {
       title: "Phòng Gym",
       dataIndex: ["gym", "gymName"],
