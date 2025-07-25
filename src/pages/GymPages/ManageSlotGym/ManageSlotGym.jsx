@@ -327,7 +327,7 @@ export default function ManageSlotGym() {
     slot.name.toLowerCase().includes(searchText.toLowerCase())
   );
   return (
-    <div className=" bg-gray-50 min-h-screen">
+    <div className="  min-h-screen">
       <div className="">
         <div className="mb-6">
           <Title level={2} className="!mb-2 flex items-center gap-2">

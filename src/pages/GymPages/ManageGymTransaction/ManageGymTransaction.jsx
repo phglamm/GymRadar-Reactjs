@@ -139,19 +139,19 @@ export default function ManageGymTransaction() {
         </Tooltip>
       ),
     },
-    {
-      title: "Khách Hàng",
-      key: "customer",
-      align: "center",
-      render: (record) => (
-        <div>
-          <div className="font-medium">{record.user?.fullName || "N/A"}</div>
-          <div className="text-xs text-gray-500">
-            {record.user?.email || "N/A"}
-          </div>
-        </div>
-      ),
-    },
+    // {
+    //   title: "Khách Hàng",
+    //   key: "customer",
+    //   align: "center",
+    //   render: (record) => (
+    //     <div>
+    //       <div className="font-medium">{record.user?.fullName || "N/A"}</div>
+    //       <div className="text-xs text-gray-500">
+    //         {record.user?.email || "N/A"}
+    //       </div>
+    //     </div>
+    //   ),
+    // },
     {
       title: "Phòng Gym",
       dataIndex: ["gym", "gymName"],
@@ -371,7 +371,7 @@ export default function ManageGymTransaction() {
 
           <Button
             icon={<ImStatsBars />}
-            className="bg-[#FF914D] text-white border-0 hover:bg-[#e8823d]"
+            className="!bg-[#FF914D] !text-white !border-0 hover:!bg-[#e8823d]"
           >
             Xuất báo cáo
           </Button>

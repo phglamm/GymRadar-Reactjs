@@ -37,7 +37,7 @@ export default function AdminLayout() {
   };
 
   return (
-    <Layout className="min-h-screen bg-gray-50">
+    <Layout className="min-h-screen ">
       <SidebarAdmin collapsed={collapsed} onCollapse={setCollapsed} />
 
       <Layout
@@ -48,7 +48,7 @@ export default function AdminLayout() {
       >
         <HeaderAdmin />
 
-        <Content className="bg-gray-50">
+        <Content className="">
           {/* Breadcrumb Section */}
           <div className="bg-white shadow-sm  px-6 py-4">
             <Breadcrumb

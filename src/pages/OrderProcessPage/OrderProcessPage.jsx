@@ -121,7 +121,7 @@ export default function OrderProcessPage() {
 
           {/* Order Details */}
           {orderData && (
-            <div className="bg-gray-50 rounded-xl p-6 mb-8 shadow-sm">
+            <div className=" rounded-xl p-6 mb-8 shadow-sm">
               <h3 className="text-xl font-bold text-black mb-4">
                 Chi tiết đơn hàng
               </h3>
